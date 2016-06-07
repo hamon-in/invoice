@@ -13,8 +13,8 @@ class Config(InvoiceBase, Base):
     name = Column(String(50), unique = True)
     value = Column(String(100))
 
-class Company(InvoiceBase, Base):
-    __tablename__ = "company"
+class Account(InvoiceBase, Base):
+    __tablename__ = "accounts"
     id = Column(Integer, primary_key = True)
     name = Column(String(50))
 
