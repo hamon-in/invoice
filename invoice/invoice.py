@@ -1,8 +1,8 @@
 import argparse
 import logging
 
-import model
-import commands
+from . import model
+from . import commands
 
 l = None
 

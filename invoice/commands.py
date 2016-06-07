@@ -2,7 +2,7 @@ from collections import ChainMap
 import logging
 import os
 
-import model
+from . import model
 
 class Command:
     def __init__(self, args):
