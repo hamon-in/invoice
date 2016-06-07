@@ -1,7 +1,20 @@
 import argparse
+import logging
 
 import model
 import commands
+
+l = None
+
+def setup_logging(level = logging.DEBUG):
+    global l 
+    l = logging.getLogger("invoice")
+    l.setLevel(level)
+    shandler = logging.StreamHandler()
+    shandler.setFormatter(logging.Formatter("%(message)s"))
+    shandler.setLevel(level)
+    l.addHandler(shandler)
+    
 
 def parse_args():
     parser = argparse.ArgumentParser(description = "Manage invoices")
@@ -25,11 +38,13 @@ def parse_args():
 
 def dispatch(args):
     cmd = args.command if hasattr(args, "command") else ""
+    l.debug("Command is '%s'", cmd)
     dispatcher = commands.get_commands()
     command_class = dispatcher[cmd]
     command_handler = command_class(args)
 
 def main():
+    setup_logging()
     args = parse_args()
     dispatch(args)
 
