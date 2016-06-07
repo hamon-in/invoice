@@ -42,6 +42,7 @@ def dispatch(args):
     dispatcher = commands.get_commands()
     command_class = dispatcher[cmd]
     command_handler = command_class(args)
+    command_handler()
 
 def main():
     setup_logging()
