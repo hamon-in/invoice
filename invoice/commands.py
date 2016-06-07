@@ -15,7 +15,6 @@ class Command:
 class InitCommand(Command):
     def __init__(self, args):
         super().__init__(args)
-        print ("Database is {}".format(self.args))
 
     def __call__(self):
         """
@@ -28,7 +27,6 @@ class InitCommand(Command):
 class CompanyCommand(Command):
     def __init__(self, args):
         super().__init__(args)
-        print ("Database is {}".format(self.args['db']))
 
 
 
