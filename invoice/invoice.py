@@ -24,13 +24,22 @@ def parse_args():
 
     init_parser = subparsers.add_parser("init", help="Initialise invoice database")
 
-    company_parser = subparsers.add_parser("company", help="Manage companies")
-    company_parser.add_argument("-v", "--verbose", help="Display verbose output")
-    company_ops = company_parser.add_mutually_exclusive_group()
+    account_parser = subparsers.add_parser("account", help="Manage Accounts")
+    account_parser.add_argument("-v", "--verbose", help="Display verbose output")
 
-    company_ops.add_argument("-a", "--add", help="Add a new company")
-    company_ops.add_argument("-l", "--list", help="List companies")
-    company_ops.add_argument("-r", "--rm", help="Delete a company")
+    account_subparsers = account_parser.add_subparsers(title = "Account commands", dest="acc_op", metavar = "<Account operation>", help="Commands to manipulate accounts")
+    account_subparsers.required = True
+    account_add_parser = account_subparsers.add_parser("add", help = "Create a new account")
+    account_add_parser.add_argument("-n", "--name", help = "Name of account", required = True)
+    account_add_parser.add_argument("-a", "--address", help = "Billing address account", required = True)
+    account_add_parser.add_argument("-p", "--phone", help = "Phone number", required = True)
+    account_add_parser.add_argument("-e", "--email", help = "Email address", required = True)
+    account_add_parser.add_argument("--pan", help = "Pan number")
+    account_add_parser.add_argument("--serv", help = "Service tax number")
+    account_add_parser.add_argument("--acc", help = "Bank account number")
+    account_add_parser.add_argument("--prefix", help = "Invoice number prefix")
+    
+    account_add_parser = account_subparsers.add_parser("list", help = "List accounts")
 
     args = parser.parse_args()
     return args
