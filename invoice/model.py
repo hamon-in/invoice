@@ -17,6 +17,13 @@ class Account(InvoiceBase, Base):
     __tablename__ = "accounts"
     id = Column(Integer, primary_key = True)
     name = Column(String(50))
+    address = Column(String(500))
+    phone = Column(String(15))
+    email = Column(String(30))
+    pan = Column(String(10))
+    serv_tax_num = Column(String(10))
+    bank_account_num = Column(String(20))
+    prefix = Column(String(10))
 
 
 def create_database(db_file):
