@@ -1,11 +1,15 @@
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, String, Integer, create_engine
+from sqlalchemy.orm import sessionmaker
+
+from  .helpers import memoise
 
 Base = declarative_base()
 
+
 class InvoiceBase:
     def __repr__(self):
-        return "<{}(name='{}'...)>".format(self.name)
+        return "<{}(name='{}'...)>".format(self.__class__.__name__, self.name)
 
 class Config(InvoiceBase, Base):
     __tablename__ = "config"
@@ -26,12 +30,20 @@ class Account(InvoiceBase, Base):
     prefix = Column(String(10))
 
 
+@memoise
+def get_session(db_file):
+    url = "sqlite:///{}".format(db_file)
+    engine = create_engine(url)
+    Session = sessionmaker(bind = engine)
+    session = Session()
+    return session
+
 def create_database(db_file):
     url = "sqlite:///{}".format(db_file)
     engine = create_engine(url)
     Base.metadata.create_all(engine)
     
-    
+
     
     
 
