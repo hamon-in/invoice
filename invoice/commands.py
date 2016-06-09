@@ -44,7 +44,6 @@ class AccountCommand(Command):
 
 
     def add_account(self):
-        print (self.args['name'])
         account = model.Account(name = self.args['name'],
                                 address = self.args['address'],
                                 phone = self.args['phone'],

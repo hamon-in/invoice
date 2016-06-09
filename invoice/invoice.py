@@ -23,10 +23,7 @@ def parse_args():
     subparsers.required = True
 
     init_parser = subparsers.add_parser("init", help="Initialise invoice database")
-
     account_parser = subparsers.add_parser("account", help="Manage Accounts")
-    account_parser.add_argument("-v", "--verbose", help="Display verbose output")
-
     account_subparsers = account_parser.add_subparsers(title = "Account commands", dest="op", 
                                                        metavar = "<Account operation>", 
                                                        help="Commands to manipulate accounts")
@@ -40,7 +37,6 @@ def parse_args():
     account_add_parser.add_argument("--serv", help = "Service tax number")
     account_add_parser.add_argument("--acc", help = "Bank account number")
     account_add_parser.add_argument("--prefix", help = "Invoice number prefix")
-    
     account_add_parser = account_subparsers.add_parser("list", help = "List accounts")
 
     args = parser.parse_args()
