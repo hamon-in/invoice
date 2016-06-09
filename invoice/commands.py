@@ -12,6 +12,18 @@ class Command:
         self.args = ChainMap(args.__dict__, envars_config)
         self.l = logging.getLogger("invoice")
 
+    def __call__(self):
+        sc_name = self.args['op']
+        self.l.debug(" Sub command %s", self.args['op'])
+
+        try:
+            sc_handler = self.sc_handlers[sc_name]
+        except KeyError:
+            self.l.error("No handler for command %s", self.args['op'])
+
+        return sc_handler()
+
+
 class InitCommand(Command):
     def __init__(self, args):
         super().__init__(args)
@@ -27,13 +39,9 @@ class InitCommand(Command):
 class AccountCommand(Command):
     def __init__(self, args):
         super().__init__(args)
+        self.sc_handlers = {'add'  : self.add_account,
+                            'list' : self.list_accounts}
 
-    def __call__(self):
-        sc_name = self.args['acc_op']
-        sc_handler = {'add'  : self.add_account,
-                      'list' : self.list_accounts}[sc_name]
-        
-        sc_handler()
 
     def add_account(self):
         print (self.args['name'])

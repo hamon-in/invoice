@@ -27,7 +27,9 @@ def parse_args():
     account_parser = subparsers.add_parser("account", help="Manage Accounts")
     account_parser.add_argument("-v", "--verbose", help="Display verbose output")
 
-    account_subparsers = account_parser.add_subparsers(title = "Account commands", dest="acc_op", metavar = "<Account operation>", help="Commands to manipulate accounts")
+    account_subparsers = account_parser.add_subparsers(title = "Account commands", dest="op", 
+                                                       metavar = "<Account operation>", 
+                                                       help="Commands to manipulate accounts")
     account_subparsers.required = True
     account_add_parser = account_subparsers.add_parser("add", help = "Create a new account")
     account_add_parser.add_argument("-n", "--name", help = "Name of account", required = True)
