@@ -62,9 +62,35 @@ class AccountCommand(Command):
         for i in sess.query(model.Account).all():
             self.l.info(" %5d | %s",i.id, i.name)
 
+class ClientCommand(Command):
+    def __init__(self, args):
+        super().__init__(args)
+        self.sc_handlers = {'add'  : self.add_client,
+                            'list' : self.list_clients}
+
+    def add_client(self):
+        sess = model.get_session(self.args['db'])
+        account = sess.query(model.Account).filter(model.Account.name == self.args['account']).one()
+        print (account)
+        client = model.Client(name = self.args['name'],
+                              address = self.args['address'],
+                              account = account)
+
+
+        sess.add(client)
+        sess.commit()
+
+    
+    def list_clients(self):
+        sess = model.get_session(self.args['db'])
+        self.l.info("Clients")
+        for i in sess.query(model.Client).all():
+            self.l.info(" %5d | %s | %s ",i.id, i.name, i.account.name)
+
 
 
 
 def get_commands():
-    return {"init" : InitCommand,
-            "account": AccountCommand}
+    return {"init"    : InitCommand,
+            "account" : AccountCommand,
+            "client"  : ClientCommand}

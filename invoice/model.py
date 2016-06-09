@@ -1,6 +1,6 @@
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, String, Integer, create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy import Column, String, Integer, create_engine, ForeignKey
+from sqlalchemy.orm import sessionmaker, relationship
 
 from  .helpers import memoise
 
@@ -28,6 +28,14 @@ class Account(InvoiceBase, Base):
     serv_tax_num = Column(String(10))
     bank_account_num = Column(String(20))
     prefix = Column(String(10))
+    clients = relationship('Client', backref="account")
+
+class Client(InvoiceBase, Base):
+    __tablename__ = "clients"
+    id = Column(Integer, primary_key = True)
+    name = Column(String(50))
+    address = Column(String(500))
+    account_id = Column(Integer, ForeignKey('accounts.id'))
 
 
 @memoise

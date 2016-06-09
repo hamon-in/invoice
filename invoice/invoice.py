@@ -39,6 +39,18 @@ def parse_args():
     account_add_parser.add_argument("--prefix", help = "Invoice number prefix")
     account_add_parser = account_subparsers.add_parser("list", help = "List accounts")
 
+    client_parser = subparsers.add_parser("client", help = "Manage clients")
+    client_subparsers = client_parser.add_subparsers(title = "Client commands", dest = "op",
+                                                     metavar = "<Client operation>",
+                                                     help = "Commands to manipulate clients")
+    client_subparsers.required = True
+    client_add_parser = client_subparsers.add_parser("add", help = "Add a new client")
+    client_add_parser.add_argument("-n", "--name", help = "Name of client", required = True)
+    client_add_parser.add_argument("-a", "--account", help = "Name of account under which this client is to be registered", required = True)
+    client_add_parser.add_argument("--address", help = "Client billing address", required = True)
+    client_add_parser = client_subparsers.add_parser("list", help = "List clients")
+
+
     args = parser.parse_args()
     return args
 
