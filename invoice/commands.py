@@ -35,6 +35,27 @@ class InitCommand(Command):
         self.l.debug("Creating database '%s'", self.args['db'])
         model.create_database(self.args['db'])
 
+class SummaryCommand(Command):
+    def __init__(self, args):
+        super().__init__(args)
+    
+    def __call__(self):
+        sess = model.get_session(self.args['db'])
+        self.l.info("Config:")
+        for i in sess.query(model.Config).all():
+            self.l.info("%10s:%10s", i.name, i.value)
+        self.l.info("-"*20)
+        
+        for account in sess.query(model.Account).all():
+            self.l.info("Account : %s", account.name)
+            for client in account.clients:
+                self.l.info(" Client : %s", client.name)
+            
+            
+
+
+    
+
 
 class AccountCommand(Command):
     def __init__(self, args):
@@ -93,4 +114,5 @@ class ClientCommand(Command):
 def get_commands():
     return {"init"    : InitCommand,
             "account" : AccountCommand,
-            "client"  : ClientCommand}
+            "client"  : ClientCommand,
+            "summary" : SummaryCommand}

@@ -23,6 +23,9 @@ def parse_args():
     subparsers.required = True
 
     init_parser = subparsers.add_parser("init", help="Initialise invoice database")
+
+    summary_parser = subparsers.add_parser("summary", help="Print a summary of the database contents")
+
     account_parser = subparsers.add_parser("account", help="Manage Accounts")
     account_subparsers = account_parser.add_subparsers(title = "Account commands", dest="op", 
                                                        metavar = "<Account operation>", 
@@ -49,6 +52,7 @@ def parse_args():
     client_add_parser.add_argument("-a", "--account", help = "Name of account under which this client is to be registered", required = True)
     client_add_parser.add_argument("--address", help = "Client billing address", required = True)
     client_add_parser = client_subparsers.add_parser("list", help = "List clients")
+
 
 
     args = parser.parse_args()
