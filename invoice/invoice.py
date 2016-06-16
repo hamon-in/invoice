@@ -54,9 +54,9 @@ def parse_args():
     client_add_parser = client_subparsers.add_parser("list", help = "List clients")
 
     template_parser = subparsers.add_parser("template", help = "Manage templates")
-    template_subarsers = template_parser.add_subparsers(title = "Invoice commands", dest = "op",
-                                                      metavar = "<Invoice operation>",
-                                                      help = "Commands to manipulate clients")
+    template_subarsers = template_parser.add_subparsers(title = "Template commands", dest = "op",
+                                                      metavar = "<Template operation>",
+                                                      help = "Commands to manipulate Templates")
     template_subarsers.required = True
     template_add_parser = template_subarsers.add_parser("add", help = "Add a new template")
     template_add_parser.add_argument("-n", "--name",  required = True, help = "Name of invoice")
