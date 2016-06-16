@@ -204,11 +204,20 @@ class ClientCommand(Command):
             self.l.info(" %5d | %s | %s ",i.id, i.name, i.account.name)
 
 
+class InvoiceCommand(Command):
+    def __init__(self, args):
+        super().__init__(args)
+        self.sc_handlers = {'add'  : self.add}
+    
+    def add(self):
+        self.l.debug("Adding invoice")
+
 
 
 def get_commands():
-    return {"init"    : InitCommand,
-            "account" : AccountCommand,
-            "client"  : ClientCommand,
+    return {"init"     : InitCommand,
+            "account"  : AccountCommand,
+            "client"   : ClientCommand,
             "template" : TemplateCommand,
-            "summary" : SummaryCommand}
+            "summary"  : SummaryCommand,
+            "invoice"  : InvoiceCommand}

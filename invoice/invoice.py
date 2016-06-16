@@ -1,4 +1,5 @@
 import argparse
+import datetime
 import logging
 
 from . import model
@@ -66,6 +67,18 @@ def parse_args():
     template_edit_parser.add_argument("-d", "--desc",  default=argparse.SUPPRESS, help = "Change description to this")
     template_del_parser = template_subarsers.add_parser("rm", help = "Delete template")
     template_del_parser.add_argument("-n", "--name", required = True, help = "Name of invoice to delete")
+
+    invoice_parser = subparsers.add_parser("invoice", help = "Manage invoices")
+    invoice_subparsers = invoice_parser.add_subparsers(title = "Invoice commands", dest = "op",
+                                                      metavar = "<Invoice operation>",
+                                                      help = "Commands to manipulate invoices")
+    invoice_subparsers.required = True
+    invoice_add_parser = invoice_subparsers.add_parser("add", help = "Add a new invoice")
+    invoice_add_parser.add_argument("-c", "--client", required = True, help = "Which client this invoice is for")
+    invoice_add_parser.add_argument("-t", "--template", required = True, help = "Which template to use for this invoice")
+    invoice_add_parser.add_argument("-d", "--date", default = datetime.date.today().strftime("%-d/%m/%Y"), help = "Invoice date (dd/mm/yyyy): Default is %(default)s")
+    
+    
 
     args = parser.parse_args()
     return args
