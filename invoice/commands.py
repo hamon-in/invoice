@@ -23,7 +23,7 @@ class Command:
             sc_handler = self.sc_handlers[sc_name]
         except KeyError:
             self.l.error("No handler for command %s", self.args['op'])
-
+            raise
         return sc_handler()
 
 
@@ -67,7 +67,8 @@ class SummaryCommand(Command):
 class TemplateCommand(Command):
     def __init__(self, args):
         super().__init__(args)
-        self.sc_handlers = {"add" : self.add}
+        self.sc_handlers = {"add"  : self.add,
+                            "edit" : self.edit}
 
 
     def add(self):
@@ -113,7 +114,27 @@ footer: |
         sess.add(temp)
         sess.commit()
 
+    def edit(self):
+        sess = model.get_session(self.args['db'])
+        template = sess.query(model.InvoiceTemplate).filter(model.InvoiceTemplate.name==self.args['name']).one()
 
+        for i in range(2):
+            fname, new_template = helpers.get_from_file(template.template)
+            try:
+                yaml.load(new_template)
+                break
+            except yaml.YAMLError:
+                if i != 1:
+                    self.l.warn("Error in input. Please check again")
+                    input()
+        else:
+            self.l.critical("Error in template format. Aborting")
+            raise ValueError("Bad format in invoice template. Can't proceed.")
+
+        template.template = new_template
+        sess.add(template)
+        sess.commit()
+        
 
 
         

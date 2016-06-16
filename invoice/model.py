@@ -38,8 +38,7 @@ class Client(InvoiceBase, Base):
 
 class InvoiceTemplate(InvoiceBase,  Base):
     __tablename__ = "templates"
-    id = Column(Integer, primary_key = True)
-    name = Column(String(50))
+    name = Column(String(50), primary_key = True)
     description = Column(String(200))
     template = Column(String(500))
     
