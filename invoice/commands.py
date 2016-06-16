@@ -2,7 +2,10 @@ from collections import ChainMap
 import logging
 import os
 
+import yaml
+
 from . import model
+from . import helpers
 
 class Command:
     def __init__(self, args):
@@ -41,20 +44,80 @@ class SummaryCommand(Command):
     
     def __call__(self):
         sess = model.get_session(self.args['db'])
+
         self.l.info("Config:")
         for i in sess.query(model.Config).all():
             self.l.info("%10s:%10s", i.name, i.value)
         self.l.info("-"*20)
         
+        self.l.info("Accounts:")
         for account in sess.query(model.Account).all():
-            self.l.info("Account : %s", account.name)
+            self.l.info(" %s", account.name)
             for client in account.clients:
-                self.l.info(" Client : %s", client.name)
+                self.l.info("  %s", client.name)
+        self.l.info("-"*20)
+
+        self.l.info("Invoice templates:")
+        for template in sess.query(model.InvoiceTemplate).all():
+            self.l.info(" %s", template.name)        
+        self.l.info("-"*20)
+
             
             
+class TemplateCommand(Command):
+    def __init__(self, args):
+        super().__init__(args)
+        self.sc_handlers = {"add" : self.add}
 
 
-    
+    def add(self):
+        template = """# Edit the following template to suit your needs
+# The file is in yaml
+# | separates fields
+
+# Remove taxes that you don't need
+taxes:
+     - service: 0.12
+     - kk_cess: 0.5
+     - sb_cess: 0.5
+
+
+rows: |
+        | Serial no | Description | Quantity | Rate | Total |
+
+
+footer: |
+        | | | | Net total | {net_total} |
+        | | | | Service tax | {service} |
+        | | | | KK Cess | {kk_cess} |
+        | | | | Swach Bharat Cess | {sb_cess} |
+        | | | | Gross total | {gross_total} |
+        
+"""
+        for i in range(2):
+            fname, template = helpers.get_from_file(template)
+            try:
+                yaml.load(template)
+                break
+            except yaml.YAMLError:
+                if i != 1:
+                    self.l.warn("Error in input. Please check again")
+                    input()
+        else:
+            self.l.critical("Error in template format. Aborting")
+            raise ValueError("Bad format in invoice template. Can't proceed.")
+        temp = model.InvoiceTemplate(name = self.args['name'], 
+                                     description = self.args['desc'], 
+                                     template = template)
+        sess = model.get_session(self.args['db'])
+        sess.add(temp)
+        sess.commit()
+
+
+
+
+        
+        
 
 
 class AccountCommand(Command):
@@ -115,4 +178,5 @@ def get_commands():
     return {"init"    : InitCommand,
             "account" : AccountCommand,
             "client"  : ClientCommand,
+            "template" : TemplateCommand,
             "summary" : SummaryCommand}

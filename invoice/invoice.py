@@ -53,7 +53,17 @@ def parse_args():
     client_add_parser.add_argument("--address", help = "Client billing address", required = True)
     client_add_parser = client_subparsers.add_parser("list", help = "List clients")
 
-
+    template_parser = subparsers.add_parser("template", help = "Manage templates")
+    template_subarsers = template_parser.add_subparsers(title = "Invoice commands", dest = "op",
+                                                      metavar = "<Invoice operation>",
+                                                      help = "Commands to manipulate clients")
+    template_subarsers.required = True
+    template_add_parser = template_subarsers.add_parser("add", help = "Add a new template")
+    template_add_parser.add_argument("-n", "--name",  required = True, help = "Name of invoice")
+    template_add_parser.add_argument("-d", "--desc",  default = '', help = "Description of template")
+    template_edit_parser = template_subarsers.add_parser("edit", help = "Edit a new template")
+    template_del_parser = template_subarsers.add_parser("delete", help = "Delete template")
+    
 
     args = parser.parse_args()
     return args
