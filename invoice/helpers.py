@@ -4,6 +4,7 @@ import subprocess
 import sys
 import tempfile
 
+
 def memoise(fn):
     fn.cache = {}
     functools.wraps(fn)
@@ -18,10 +19,10 @@ def memoise(fn):
     return memoised_fn
 
 
-def get_from_file(init_string=''):
-    f = tempfile.NamedTemporaryFile(delete = False)
+def get_from_file(init_string='', delete = False):
+    f = tempfile.NamedTemporaryFile(mode = "w", delete = False)
     fname = f.name
-    f.write(init_string.encode("utf-8"))
+    f.write(init_string)
     f.close()
     editor_cmd = os.environ.get("EDITOR", "/usr/bin/vi").split()
     editor_cmd.append(f.name)
@@ -29,10 +30,11 @@ def get_from_file(init_string=''):
     p.wait()
     if p.returncode != 0:
         raise IOError("Error while spawning editor")
-    with open(f.name) as f0:
+    with open(f.name, "r") as f0:
         data = f0.read()
-    os.unlink(f.name)
-    return data
+    if delete:
+        os.unlink(f.name)
+    return (f.name, data)
     
 
 
