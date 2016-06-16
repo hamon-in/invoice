@@ -68,7 +68,8 @@ class TemplateCommand(Command):
     def __init__(self, args):
         super().__init__(args)
         self.sc_handlers = {"add"  : self.add,
-                            "edit" : self.edit}
+                            "edit" : self.edit,
+                            "rm"   : self.rm}
 
 
     def add(self):
@@ -140,8 +141,13 @@ footer: |
         sess.commit()
         self.l.debug("Saved")
         
+    def rm(self):
+        sess = model.get_session(self.args['db'])
+        template = sess.query(model.InvoiceTemplate).filter(model.InvoiceTemplate.name==self.args['name']).one()
+        sess.delete(template)
+        sess.commit()
 
-
+    
         
         
 
