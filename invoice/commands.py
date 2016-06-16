@@ -117,23 +117,28 @@ footer: |
     def edit(self):
         sess = model.get_session(self.args['db'])
         template = sess.query(model.InvoiceTemplate).filter(model.InvoiceTemplate.name==self.args['name']).one()
-
-        for i in range(2):
-            fname, new_template = helpers.get_from_file(template.template)
-            try:
-                yaml.load(new_template)
-                break
-            except yaml.YAMLError:
-                if i != 1:
-                    self.l.warn("Error in input. Please check again")
-                    input()
+        if 'desc' in self.args:
+            template.description = self.args['desc']
+            self.l.debug("Description of %s updated", self.args['name'])
         else:
-            self.l.critical("Error in template format. Aborting")
-            raise ValueError("Bad format in invoice template. Can't proceed.")
+            for i in range(2):
+                fname, new_template = helpers.get_from_file(template.template)
+                try:
+                    yaml.load(new_template)
+                    template.template = new_template
+                    self.l.debug("Template of %s updated", self.args['name'])
+                    break
+                except yaml.YAMLError:
+                    if i != 1:
+                        self.l.warn("Error in input. Please check again")
+                        input()
+            else:
+                self.l.critical("Error in template format. Aborting")
+                raise ValueError("Bad format in invoice template. Can't proceed.")
 
-        template.template = new_template
         sess.add(template)
         sess.commit()
+        self.l.debug("Saved")
         
 
 
