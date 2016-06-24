@@ -2,6 +2,8 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, String, Integer, create_engine, ForeignKey, BLOB
 from sqlalchemy.orm import sessionmaker, relationship
 
+import yaml
+
 from  .helpers import memoise
 
 Base = declarative_base()
@@ -41,7 +43,13 @@ class InvoiceTemplate(InvoiceBase,  Base):
     name = Column(String(50), primary_key = True)
     description = Column(String(200))
     template = Column(String(500))
-    
+    invoices = relationship("Invoice", back_populates="template")
+    letterhead = Column(BLOB(1024*1024))
+
+    def fields(self):
+        data = yaml.load(self.template)
+        return [x.strip() for x in data['rows'].split("|")]
+
 class Invoice(InvoiceBase, Base):
     __tablename__ = "invoices"
     id = Column(Integer,  primary_key = True)
