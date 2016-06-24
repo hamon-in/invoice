@@ -42,6 +42,12 @@ class InvoiceTemplate(InvoiceBase,  Base):
     description = Column(String(200))
     template = Column(String(500))
     
+class Invoice(InvoiceBase, Base):
+    __tablename__ = "invoices"
+    id = Column(Integer,  primary_key = True)
+    date = Column(String(500))
+    template = relationship('InvoiceTemplate')
+    template_id = Column(String, ForeignKey('templates.name'))
 
 
 @memoise

@@ -62,11 +62,13 @@ def parse_args():
     template_add_parser = template_subarsers.add_parser("add", help = "Add a new template")
     template_add_parser.add_argument("-n", "--name",  required = True, help = "Name of invoice")
     template_add_parser.add_argument("-d", "--desc",  default = '', help = "Description of template")
+    template_add_parser.add_argument("-l", "--letterhead",  default = '', help = "Add a letterhead to use as a base PDF")
     template_edit_parser = template_subarsers.add_parser("edit", help = "Edit a new template")
     template_edit_parser.add_argument("-n", "--name",  required = True, help = "Name of invoice to edit")
     template_edit_parser.add_argument("-d", "--desc",  default=argparse.SUPPRESS, help = "Change description to this")
     template_del_parser = template_subarsers.add_parser("rm", help = "Delete template")
     template_del_parser.add_argument("-n", "--name", required = True, help = "Name of invoice to delete")
+
 
     invoice_parser = subparsers.add_parser("invoice", help = "Manage invoices")
     invoice_subparsers = invoice_parser.add_subparsers(title = "Invoice commands", dest = "op",

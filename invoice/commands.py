@@ -108,9 +108,16 @@ footer: |
         else:
             self.l.critical("Error in template format. Aborting")
             raise ValueError("Bad format in invoice template. Can't proceed.")
+        letterhead = ''
+        if self.args['letterhead']:
+            self.l.debug("Adding letterhead")
+            with open(self.args['letterhead'], "rb") as f:
+                letterhead = f.read()
+
         temp = model.InvoiceTemplate(name = self.args['name'], 
                                      description = self.args['desc'], 
-                                     template = template)
+                                     template = template,
+                                     letterhead = letterhead)
         sess = model.get_session(self.args['db'])
         sess.add(temp)
         sess.commit()
