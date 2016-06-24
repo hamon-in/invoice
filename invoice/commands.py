@@ -239,6 +239,10 @@ class InvoiceCommand(Command):
 """.format(", ".join(fields), "|".join(["          "]*5))
 
         data = helpers.get_from_file(boilerplate)
+        
+    def generate(self):
+        pass
+
 
 
 def get_commands():

@@ -4,6 +4,7 @@ import logging
 
 from . import model
 from . import commands
+from . import formatters
 
 l = None
 
@@ -18,6 +19,7 @@ def setup_logging(level = logging.DEBUG):
     
 
 def parse_args():
+    available_formats = formatters.get_formatters()
     parser = argparse.ArgumentParser(description = "Manage invoices")
     parser.add_argument("-f", "--file" , dest = "db", help = "Name of database file", default=argparse.SUPPRESS)
     subparsers = parser.add_subparsers(title="Commands", dest="command", help = "Commands available")
@@ -78,8 +80,20 @@ def parse_args():
     invoice_add_parser = invoice_subparsers.add_parser("add", help = "Add a new invoice")
     invoice_add_parser.add_argument("-c", "--client", required = True, help = "Which client this invoice is for")
     invoice_add_parser.add_argument("-t", "--template", required = True, help = "Which template to use for this invoice")
-    invoice_add_parser.add_argument("-d", "--date", default = datetime.date.today().strftime("%-d/%m/%Y"), help = "Invoice date (dd/mm/yyyy): Default is %(default)s")
-    
+    invoice_add_parser.add_argument("-d", "--date", default = datetime.date.today().strftime("%d/%m/%Y"), help = "Invoice date (dd/mm/yyyy): Default is %(default)s")
+    invoice_generate_parser = invoice_subparsers.add_parser("generate", help = "Generate an invoice")
+    default_from = datetime.date.today().replace(day = 1).strftime("%d/%m/%Y")
+    default_to = datetime.date.today().strftime("%d/%m/%Y")
+    invoice_generate_parser.add_argument("-f", "--from", 
+                                         default = default_from,
+                                         help = "Generate all invoices since this date (dd/mm/yyyy). Default is %(default)s")
+    invoice_generate_parser.add_argument("-t", "--to",
+                                         default = default_to,
+                                         help = "Generate all invoices till this date (dd/mm/yyyy). Default is %(default)s")
+    invoice_generate_parser.add_argument("--format", required = True,
+                                         default = list(available_formats)[0],
+                                         choices = available_formats,
+                                         help = "Format to output invoice. Default is %(default)s")
     
 
     args = parser.parse_args()
