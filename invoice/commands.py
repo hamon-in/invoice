@@ -214,11 +214,31 @@ class ClientCommand(Command):
 class InvoiceCommand(Command):
     def __init__(self, args):
         super().__init__(args)
-        self.sc_handlers = {'add'  : self.add}
+        self.sc_handlers = {'add'  : self.add,
+                            'generate' : self.generate}
     
     def add(self):
+        sess = model.get_session(self.args['db'])
         self.l.debug("Adding invoice")
+        template = sess.query(model.InvoiceTemplate).filter(model.InvoiceTemplate.name == self.args['template']).one()
+        client = sess.query(model.Client).filter(model.Client.name == self.args['client']).one() 
+        
+        fields = template.fields()
+        boilerplate = """# -*- text -*-
+# Local Variables: 
+# eval: (orgtbl-mode) 
+# End:
+#
+# The fields are as follows
+# {}
+#
+#
 
+|{}|
+
+""".format(", ".join(fields), "|".join(["          "]*5))
+
+        data = helpers.get_from_file(boilerplate)
 
 
 def get_commands():
