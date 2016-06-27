@@ -1,3 +1,4 @@
+import datetime
 from collections import ChainMap
 import logging
 import os
@@ -222,8 +223,9 @@ class InvoiceCommand(Command):
                             'generate' : self.generate}
     
     def add(self):
-        sess = model.get_session(self.args['db'])
         self.l.debug("Adding invoice")
+        sess = model.get_session(self.args['db'])
+        date = datetime.datetime.strptime(self.args['date'], "%d/%m/%Y")
         template = sess.query(model.InvoiceTemplate).filter(model.InvoiceTemplate.name == self.args['template']).one()
         client = sess.query(model.Client).filter(model.Client.name == self.args['client']).one() 
         

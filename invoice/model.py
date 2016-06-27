@@ -1,5 +1,5 @@
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, String, Integer, create_engine, ForeignKey, BLOB
+from sqlalchemy import Column, String, Integer, create_engine, ForeignKey, BLOB, Date
 from sqlalchemy.orm import sessionmaker, relationship
 
 import yaml
@@ -53,7 +53,7 @@ class InvoiceTemplate(InvoiceBase,  Base):
 class Invoice(InvoiceBase, Base):
     __tablename__ = "invoices"
     id = Column(Integer,  primary_key = True)
-    date = Column(String(500))
+    date = Column(Date)
     template = relationship('InvoiceTemplate')
     template_id = Column(String, ForeignKey('templates.name'))
 
