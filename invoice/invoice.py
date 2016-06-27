@@ -90,7 +90,7 @@ def parse_args():
     invoice_generate_parser.add_argument("-t", "--to",
                                          default = default_to,
                                          help = "Generate all invoices till this date (dd/mm/yyyy). Default is %(default)s")
-    invoice_generate_parser.add_argument("--format", required = True,
+    invoice_generate_parser.add_argument("--format", 
                                          default = list(available_formats)[0],
                                          choices = available_formats,
                                          help = "Format to output invoice. Default is %(default)s")

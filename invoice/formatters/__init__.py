@@ -1,6 +1,6 @@
 from collections import OrderedDict
 
-from . import PDFFormatter
+from .PDFFormatter import PDFFormatter
 
 def get_formatters():
     return OrderedDict([('pdf',  PDFFormatter)])

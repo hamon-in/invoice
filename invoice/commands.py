@@ -6,6 +6,7 @@ import yaml
 
 from . import model
 from . import helpers
+from . import formatters
 
 class Command:
     def __init__(self, args):
@@ -14,6 +15,7 @@ class Command:
                          if k.startswith("INVOICE_")}
         self.args = ChainMap(args.__dict__, envars_config)
         self.l = logging.getLogger("invoice")
+        self.formatters = formatters.get_formatters()
 
     def __call__(self):
         sc_name = self.args['op']
