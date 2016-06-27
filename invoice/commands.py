@@ -55,6 +55,8 @@ class SummaryCommand(Command):
             self.l.info(" %s", account.name)
             for client in account.clients:
                 self.l.info("  %s", client.name)
+                for invoice in client.invoices:
+                    self.l.info("     %s %s", invoice.date.strftime("%d/%m/%Y"), invoice.id)
         self.l.info("-"*20)
 
         self.l.info("Invoice templates:")
