@@ -241,6 +241,11 @@ class InvoiceCommand(Command):
 """.format(", ".join(fields), "|".join(["          "]*5))
 
         data = helpers.get_from_file(boilerplate)
+        invoice = model.Invoice(date = date,
+                                template = template,
+                                client = client)
+        sess.add(invoice)
+        sess.commit()
         
     def generate(self):
         pass
