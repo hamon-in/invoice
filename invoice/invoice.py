@@ -95,6 +95,9 @@ def parse_args():
                                          choices = available_formats,
                                          help = "Format to output invoice. Default is %(default)s")
     
+    invoice_generate_parser.add_argument("-c", "--client",
+                                         required = True,
+                                         help = "Which client to generate invoices for.")
 
     args = parser.parse_args()
     return args
