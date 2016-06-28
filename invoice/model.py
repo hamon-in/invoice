@@ -61,6 +61,14 @@ class Invoice(InvoiceBase, Base):
     client_id = Column(String,  ForeignKey('clients.name'))
     content = Column(String)
 
+    def serialise(self):
+        """
+        Takes all the data necessary to generate this invoice and coverts
+        it into a nice dictionary that can be used by the formatter to 
+        create the final PDF/HTML invoice.
+        """
+        address = self.client.account.address
+        return dict(address = address)
     
 
 
