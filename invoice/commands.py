@@ -252,7 +252,18 @@ class InvoiceCommand(Command):
         sess.commit()
         
     def generate(self):
-        pass
+        sess = model.get_session(self.args['db'])
+        date_start = datetime.datetime.strptime(self.args['from'], "%d/%m/%Y")
+        date_to = datetime.datetime.strptime(self.args['to'], "%d/%m/%Y")
+        fmt_name = self.args['format']
+        self.l.info("Invoices between %s and %s", self.args['from'], self.args['to'])
+
+        invoices = sess.query(model.Invoice).join(model.Client).filter(model.Client.name == self.args['client'],
+                                                                       date_start <= model.Invoice.date,
+                                                                       model.Invoice.date <= date_to).all()
+        formatter = self.formatters[fmt_name]
+        for invoice in invoices:
+            pdf_invoice = formatter.generate(invoice)
 
 
 
