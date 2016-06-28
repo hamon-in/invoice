@@ -1,23 +1,29 @@
+import io
+
+from PyPDF2 import PdfFileWriter, PdfFileReader
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+
 from .common import Formatter
 
 class PDFFormatter(Formatter):
-    def generate(self):
-        from PyPDF2 import PdfFileWriter, PdfFileReader
-        import io
-        from reportlab.pdfgen import canvas
-        from reportlab.lib.pagesizes import letter
-
+    def create_invoice_layer(self, invoice_data):
         packet = io.BytesIO()
         # create a new PDF with Reportlab
         can = canvas.Canvas(packet, pagesize=letter)
-        can.drawString(100, 300, "Hello world")
+        can.drawString(100, 300, "Goodbye world")
         can.save()
+        packet.seek(0)
+        return packet
+
+    def generate(self, invoice):
+        invoice_layer = self.create_invoice_layer(invoice.serialise())
 
         #move to the beginning of the StringIO buffer
-        packet.seek(0)
-        new_pdf = PdfFileReader(packet)
+        new_pdf = PdfFileReader(invoice_layer)
         # read your existing PDF
-        existing_pdf = PdfFileReader(open("Hamon-LetterHead-DigitalPrint-A4 Without Fold Marks.pdf", "rb"))
+        
+        existing_pdf = PdfFileReader(io.BytesIO(invoice.template.letterhead))
         output = PdfFileWriter()
         # add the "watermark" (which is the new pdf) on the existing page
         page = existing_pdf.getPage(0)

@@ -263,7 +263,7 @@ class InvoiceCommand(Command):
         invoices = sess.query(model.Invoice).join(model.Client).filter(model.Client.name == self.args['client'],
                                                                        date_start <= model.Invoice.date,
                                                                        model.Invoice.date <= date_to).all()
-        formatter = self.formatters[fmt_name]
+        formatter = self.formatters[fmt_name]()
         for invoice in invoices:
             pdf_invoice = formatter.generate(invoice)
 
