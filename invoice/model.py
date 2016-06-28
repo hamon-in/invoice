@@ -10,7 +10,8 @@ Base = declarative_base()
 
 class InvoiceBase:
     def __repr__(self):
-        return "<{}(name='{}'...)>".format(self.__class__.__name__, self.name)
+        name = self.name if hasattr(self, "name") else self.id
+        return "<{}(name='{}'...)>".format(self.__class__.__name__, name)
 
 class Config(InvoiceBase, Base):
     __tablename__ = "config"
