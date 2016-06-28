@@ -33,11 +33,11 @@ class Account(InvoiceBase, Base):
 
 class Client(InvoiceBase, Base):
     __tablename__ = "clients"
-    id = Column(Integer, primary_key = True)
-    name = Column(String(50))
+    name = Column(String(50), primary_key = True)
     address = Column(String(500))
     account_id = Column(Integer, ForeignKey('accounts.id'))
-
+    invoices = relationship("Invoice", back_populates="client")
+    
 class InvoiceTemplate(InvoiceBase,  Base):
     __tablename__ = "templates"
     name = Column(String(50), primary_key = True)
@@ -55,7 +55,10 @@ class Invoice(InvoiceBase, Base):
     id = Column(Integer,  primary_key = True)
     date = Column(Date)
     template = relationship('InvoiceTemplate')
+    client = relationship('Client')
     template_id = Column(String, ForeignKey('templates.name'))
+    client_id = Column(String,  ForeignKey('clients.name'))
+    
 
 
 @memoise
