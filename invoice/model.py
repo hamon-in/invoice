@@ -67,8 +67,8 @@ class Invoice(InvoiceBase, Base):
         it into a nice dictionary that can be used by the formatter to 
         create the final PDF/HTML invoice.
         """
-        address = self.client.account.address
-        return dict(address = address)
+        client_address = self.client.address
+        return dict(client_address = client_address)
     
 
 
