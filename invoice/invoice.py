@@ -81,6 +81,8 @@ def parse_args():
     invoice_add_parser.add_argument("-c", "--client", required = True, help = "Which client this invoice is for")
     invoice_add_parser.add_argument("-t", "--template", required = True, help = "Which template to use for this invoice")
     invoice_add_parser.add_argument("-d", "--date", default = datetime.date.today().strftime("%d/%m/%Y"), help = "Invoice date (dd/mm/yyyy): Default is %(default)s")
+    invoice_add_parser.add_argument("-p", "--particulars", required = True, 
+                                    help = "Subject line for this invoice")
     invoice_generate_parser = invoice_subparsers.add_parser("generate", help = "Generate an invoice")
     default_from = datetime.date.today().replace(day = 1).strftime("%d/%m/%Y")
     default_to = datetime.date.today().strftime("%d/%m/%Y")

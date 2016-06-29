@@ -56,6 +56,7 @@ class Invoice(InvoiceBase, Base):
     id = Column(Integer,  primary_key = True)
     date = Column(Date)
     template = relationship('InvoiceTemplate')
+    particulars = Column(String)
     client = relationship('Client')
     template_id = Column(String, ForeignKey('templates.name'))
     client_id = Column(String,  ForeignKey('clients.name'))

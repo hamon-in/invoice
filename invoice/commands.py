@@ -226,6 +226,7 @@ class InvoiceCommand(Command):
         self.l.debug("Adding invoice")
         sess = model.get_session(self.args['db'])
         date = datetime.datetime.strptime(self.args['date'], "%d/%m/%Y")
+        subject = self.args['particulars']
         template = sess.query(model.InvoiceTemplate).filter(model.InvoiceTemplate.name == self.args['template']).one()
         client = sess.query(model.Client).filter(model.Client.name == self.args['client']).one() 
         
@@ -246,6 +247,7 @@ class InvoiceCommand(Command):
 
         _, data = helpers.get_from_file(boilerplate)
         invoice = model.Invoice(date = date,
+                                particulars = subject,
                                 content = data,
                                 template = template,
                                 client = client)
@@ -266,6 +268,9 @@ class InvoiceCommand(Command):
         formatter = self.formatters[fmt_name]()
         for invoice in invoices:
             pdf_invoice = formatter.generate(invoice)
+
+            
+
 
 
 
