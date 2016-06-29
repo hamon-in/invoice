@@ -61,6 +61,19 @@ class Invoice(InvoiceBase, Base):
     client_id = Column(String,  ForeignKey('clients.name'))
     content = Column(String)
 
+    def get_invoice_number(self):
+        curr_year = int(self.date.strftime("%Y"))
+        curr_month = int(self.date.strftime("%m"))
+        if 1 <= curr_month <= 4: 
+            next_year = curr_year
+            curr_year -= 1
+        else:
+            next_year = curr_year + 1
+        return "{}/{}-{}".format(curr_year, next_year, self.id)
+            
+
+        
+
     def serialise(self):
         """
         Takes all the data necessary to generate this invoice and coverts
@@ -68,7 +81,11 @@ class Invoice(InvoiceBase, Base):
         create the final PDF/HTML invoice.
         """
         client_address = self.client.address
-        return dict(client_address = client_address)
+        date = self.date.strftime("%d %b %Y")
+        invoice_number = self.get_invoice_number()
+        return dict(client_address = client_address,
+                    date = date,
+                    number = invoice_number)
     
 
 
