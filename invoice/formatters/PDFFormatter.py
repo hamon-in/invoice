@@ -8,26 +8,36 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.rl_config import defaultPageSize
 from reportlab.lib.units import inch
-PAGE_HEIGHT=defaultPageSize[1]; PAGE_WIDTH=defaultPageSize[0]
-styles = getSampleStyleSheet()
 
 from .common import Formatter
 
+# PAGE_HEIGHT=defaultPageSize[1]; PAGE_WIDTH=defaultPageSize[0]
+
+styles = getSampleStyleSheet()
+BodyStyle = styles["BodyText"]
+BodyStyle.fontName = "Times-Roman"
+
+
 class PDFFormatter(Formatter):
     def create_invoice_layer(self, invoice_data):
+        client_address = invoice_data['client_address'].encode('utf-8').decode('unicode_escape')
+        client_address = client_address.replace('\n', '<br/>')
+        date = invoice_data['date']
+        number = invoice_data['number']
+
         packet = io.BytesIO()
         # create a new PDF with Reportlab
         doc = SimpleDocTemplate(packet)
-        Story = [Spacer(1,2*inch)]
-        style = styles["BodyText"]
-        
-        client_address = invoice_data['client_address'].encode('utf-8').decode('unicode_escape')
-        client_address = client_address.replace('\n', '<br/>')
+        content = [Spacer(1,2*inch)]
+
+        content.append(Paragraph("<b>Date:</b> {}".format(date), BodyStyle))
+        content.append(Paragraph("<b>Number:</b> {}".format(number), BodyStyle))
+        doc.build(content)
+
         text = "<b><i>Bill to:</i></b><br/>{}".format(client_address)
-        p = Paragraph(text, style)
-        Story.append(p)
-        Story.append(Spacer(1,0.2*inch))
-        doc.build(Story)
+        content.append(Paragraph(text, BodyStyle))
+        content.append(Spacer(1,0.2*inch))
+
 
         return packet
 
