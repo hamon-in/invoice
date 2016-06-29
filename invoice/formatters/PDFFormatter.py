@@ -55,7 +55,7 @@ class PDFFormatter(Formatter):
         page.mergePage(new_pdf.getPage(0))
         output.addPage(page)
         # finally, write "output" to a real file
-        outputStream = open("output.pdf", "wb")
+        outputStream = open(invoice.file_name+".pdf", "wb")
         output.write(outputStream)
         outputStream.close()
 
