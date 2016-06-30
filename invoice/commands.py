@@ -267,6 +267,7 @@ class InvoiceCommand(Command):
                                                                        model.Invoice.date <= date_to).all()
         formatter = self.formatters[fmt_name]()
         for invoice in invoices:
+            self.l.info(  "Generating invoice %s", invoice.file_name)
             pdf_invoice = formatter.generate(invoice)
 
             
