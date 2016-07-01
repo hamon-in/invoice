@@ -5,7 +5,7 @@ from PyPDF2 import PdfFileWriter, PdfFileReader
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
 
-from reportlab.lib.enums import TA_CENTER, TA_LEFT
+from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
 from reportlab.lib import colors
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table
 from reportlab.platypus.tables import TableStyle
@@ -31,7 +31,7 @@ class PDFFormatter(Formatter):
                                                        fontSize = 10, alignment = TA_LEFT),
 
                            regular = ParagraphStyle("to_address", fontName = "Times-Roman", leading = 12,
-                                                    fontSize = 10, alignment = TA_LEFT)
+                                                    fontSize = 10, alignment = TA_RIGHT)
           )
         super().__init__()
 
@@ -80,7 +80,7 @@ class PDFFormatter(Formatter):
         for i in data_columns:
             if i[-1]:
                 total += Decimal(i[-1])
-            columns.append(i)
+            columns.append(Paragraph(str(t), self.styles['regular']) for t in i)
 
         extra_vals = dict(net_total = total)
         for t,v in taxes.items():
@@ -90,8 +90,14 @@ class PDFFormatter(Formatter):
         extra_vals['gross_total'] = sum(extra_vals.values())
 
         for i in footers:
-            print (i)
-            columns.append([x.format(**extra_vals) for x in i])
+            c1 =[] 
+            for j in i:
+                j = j.format(**extra_vals)
+                if j.startswith("b:"):
+                    c1.append(Paragraph("<b>{}</b>".format(j.replace("b:","")), self.styles['regular']))
+                else:
+                    c1.append(Paragraph(str(j), self.styles['regular']))
+            columns.append(c1)
 
         content.append(Table(columns, style = list_style))
         doc.build(content)
