@@ -1,3 +1,4 @@
+from decimal import Decimal
 import io
 
 from PyPDF2 import PdfFileWriter, PdfFileReader
@@ -41,6 +42,8 @@ class PDFFormatter(Formatter):
         number = invoice_data['number']
         particulars = invoice_data['particulars']
         data_columns = invoice_data['columns']
+        footers = invoice_data['footers']
+        taxes = invoice_data['taxes']
 
         # create a new PDF with Reportlab
         packet = io.BytesIO()
@@ -66,15 +69,30 @@ class PDFFormatter(Formatter):
              ('LINEBELOW', (0,0), (-1,0), 1, colors.black),
              ('BACKGROUND',(0,0), (-1,0), colors.grey),
              ('BACKGROUND' ,(-1,1), (-1,-1), colors.lightgrey),
-             ('ALIGN' ,(-1,1), (-1,-1), 'LEFT'),
+             ('ALIGN' ,(-1,1), (-1,-1), 'RIGHT'),
              ('LINEABOVE', (0,1), (-1,-1), 0.25, colors.black),
              ('LINEBELOW', (0,-1), (-1,-1), 1, colors.black),
              ('LINEABOVE', (0,-1), (-1,-1), 1, colors.black),
          ])
 
+        total = Decimal(0)
         content.append(Spacer(1, 0.1*inch))
         for i in data_columns:
+            if i[-1]:
+                total += Decimal(i[-1])
             columns.append(i)
+
+        extra_vals = dict(net_total = total)
+        for t,v in taxes.items():
+            n = total*Decimal(v)
+            extra_vals[t] = n.quantize(Decimal('0.01'))
+
+        extra_vals['gross_total'] = sum(extra_vals.values())
+
+        for i in footers:
+            print (i)
+            columns.append([x.format(**extra_vals) for x in i])
+
         content.append(Table(columns, style = list_style))
         doc.build(content)
         return packet

@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, String, Integer, create_engine, ForeignKey, BLOB, Date
 from sqlalchemy.orm import sessionmaker, relationship
@@ -48,6 +50,11 @@ class InvoiceTemplate(InvoiceBase,  Base):
     letterhead = Column(BLOB(1024*1024))
 
     @property
+    def taxes(self):
+        data = yaml.load(self.template)
+        return data.get('taxes',{})
+
+    @property
     def fields(self):
         data = yaml.load(self.template)
         return [x.strip() for x in data['rows'].strip().strip("|").split("|")]
@@ -88,11 +95,15 @@ class Invoice(InvoiceBase, Base):
     
     @property
     def columns(self):
+        ret = []
         for i in self.content.split("\n"):
             i = i.strip()
             if i.startswith("#") or not i:
                 continue
-            yield i.strip().strip("|").split("|")
+            fields = i.strip().strip("|").split("|")
+            fields[-1] = Decimal(fields[-1]).quantize(Decimal('0.01'))
+            ret.append(fields)
+        return ret
 
         
     def serialise(self):
@@ -110,7 +121,8 @@ class Invoice(InvoiceBase, Base):
                     number = invoice_number,
                     fields = self.template.fields,
                     columns = self.columns,
-                    footers = self.template.footers)
+                    footers = self.template.footers,
+                    taxes = self.template.taxes)
     
 
 
