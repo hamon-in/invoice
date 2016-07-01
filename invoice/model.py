@@ -90,6 +90,7 @@ class Invoice(InvoiceBase, Base):
         invoice_number = self.number
         return dict(client_address = client_address,
                     date = date,
+                    particulars = self.particulars,
                     number = invoice_number,
                     fields = self.template.fields
         )

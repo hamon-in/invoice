@@ -39,6 +39,7 @@ class PDFFormatter(Formatter):
 
         date = invoice_data['date']
         number = invoice_data['number']
+        particulars = invoice_data['particulars']
 
         # create a new PDF with Reportlab
         packet = io.BytesIO()
@@ -51,6 +52,9 @@ class PDFFormatter(Formatter):
         content.append(Paragraph("<b>Bill to:</b>", self.styles['to_address']))
         for i in client_address.split("\n"):
             content.append(Paragraph(i, self.styles['to_address']))
+        content.append(Spacer(1, 0.5*inch))
+        content.append(Paragraph("<b>Subject: </b>{}".format(particulars), self.styles['to_address']))
+
 
         # Now the table headers
         headers = invoice_data['fields']
@@ -67,9 +71,9 @@ class PDFFormatter(Formatter):
              ('LINEABOVE', (0,-1), (-1,-1), 1, colors.black),
          ])
 
-        content.append(Spacer(1, 0.5*inch))
-        content.append(Table(columns, style = list_style))
+        content.append(Spacer(1, 0.1*inch))
 
+        content.append(Table(columns, style = list_style))
         doc.build(content)
         return packet
 
