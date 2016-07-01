@@ -53,13 +53,12 @@ class SummaryCommand(Command):
             self.l.info("%10s:%10s", i.name, i.value)
         self.l.info("-"*20)
         
-        self.l.info("Accounts:")
         for account in sess.query(model.Account).all():
-            self.l.info(" %s", account.name)
+            self.l.info("Account: %s", account.name)
             for client in account.clients:
-                self.l.info("  %s", client.name)
+                self.l.info("  Client: %s", client.name)
                 for invoice in client.invoices:
-                    self.l.info("     %s %s", invoice.date.strftime("%d/%m/%Y"), invoice.id)
+                    self.l.info("     %s | %s | %s", invoice.id, invoice.date.strftime("%d/%m/%Y") , invoice.particulars)
         self.l.info("-"*20)
 
         self.l.info("Invoice templates:")
