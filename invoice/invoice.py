@@ -84,6 +84,8 @@ def parse_args():
     invoice_add_parser.add_argument("-p", "--particulars", required = True, 
                                     help = "Subject line for this invoice")
     invoice_generate_parser = invoice_subparsers.add_parser("generate", help = "Generate an invoice")
+    invoice_delete_parser = invoice_subparsers.add_parser("rm", help = "Delete an invoice")
+    invoice_delete_parser.add_argument("-i", "--id", required = True, type = int, help = "Id of invoice to delete")
     default_from = datetime.date.today().replace(day = 1).strftime("%d/%m/%Y")
     default_to = datetime.date.today().strftime("%d/%m/%Y")
     invoice_generate_parser.add_argument("-f", "--from", 

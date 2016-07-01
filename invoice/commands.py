@@ -219,7 +219,8 @@ class InvoiceCommand(Command):
     def __init__(self, args):
         super().__init__(args)
         self.sc_handlers = {'add'  : self.add,
-                            'generate' : self.generate}
+                            'generate' : self.generate,
+                            "rm" : self.rm}
     
     def add(self):
         self.l.debug("Adding invoice")
@@ -269,7 +270,13 @@ class InvoiceCommand(Command):
             self.l.info("  Generating invoice %s", invoice.file_name)
             pdf_invoice = formatter.generate(invoice)
 
-            
+    def rm(self):
+        sess = model.get_session(self.args['db'])
+        id = self.args['id']
+        invoice = sess.query(model.Invoice).filter(model.Invoice.id == id).one()
+        sess.delete(invoice)
+        sess.commit()
+
 
 
 
