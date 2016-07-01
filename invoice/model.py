@@ -78,7 +78,16 @@ class Invoice(InvoiceBase, Base):
         else:
             next_year = curr_year + 1
         return "{}/{}-{}".format(curr_year, next_year, self.id)
-            
+    
+    @property
+    def columns(self):
+        for i in self.content.split("\n"):
+            i = i.strip()
+            if i.startswith("#") or not i:
+                continue
+            yield i.strip().strip("|").split("|")
+
+        
     def serialise(self):
         """
         Takes all the data necessary to generate this invoice and coverts
@@ -92,8 +101,8 @@ class Invoice(InvoiceBase, Base):
                     date = date,
                     particulars = self.particulars,
                     number = invoice_number,
-                    fields = self.template.fields
-        )
+                    fields = self.template.fields,
+                    columns = self.columns)
     
 
 

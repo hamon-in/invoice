@@ -40,6 +40,7 @@ class PDFFormatter(Formatter):
         date = invoice_data['date']
         number = invoice_data['number']
         particulars = invoice_data['particulars']
+        data_columns = invoice_data['columns']
 
         # create a new PDF with Reportlab
         packet = io.BytesIO()
@@ -72,7 +73,8 @@ class PDFFormatter(Formatter):
          ])
 
         content.append(Spacer(1, 0.1*inch))
-
+        for i in data_columns:
+            columns.append(i)
         content.append(Table(columns, style = list_style))
         doc.build(content)
         return packet
