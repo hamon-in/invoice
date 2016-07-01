@@ -93,7 +93,7 @@ taxes:
 
 
 rows: |
-        Serial no | Description | Quantity | Rate | Total
+        | Serial no | Description | Quantity | Rate | Total |
 
 
 footer: |

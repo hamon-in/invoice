@@ -50,7 +50,7 @@ class InvoiceTemplate(InvoiceBase,  Base):
     @property
     def fields(self):
         data = yaml.load(self.template)
-        return [x.strip() for x in data['rows'].split("|")]
+        return [x.strip() for x in data['rows'].strip().strip("|").split("|")]
 
 class Invoice(InvoiceBase, Base):
     __tablename__ = "invoices"
