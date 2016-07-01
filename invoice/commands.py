@@ -77,7 +77,11 @@ class TemplateCommand(Command):
 
 
     def add(self):
-        template = """# Edit the following template to suit your needs
+        template = """# -*- yaml -*-
+# Local Variables: 
+# eval: (orgtbl-mode) 
+# End:
+# Edit the following template to suit your needs
 # The file is in yaml
 # | separates fields
 
