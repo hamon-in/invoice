@@ -47,6 +47,7 @@ class InvoiceTemplate(InvoiceBase,  Base):
     invoices = relationship("Invoice", back_populates="template")
     letterhead = Column(BLOB(1024*1024))
 
+    @property
     def fields(self):
         data = yaml.load(self.template)
         return [x.strip() for x in data['rows'].split("|")]
@@ -90,7 +91,8 @@ class Invoice(InvoiceBase, Base):
         return dict(client_address = client_address,
                     date = date,
                     number = invoice_number,
-                    fields = self.template.fields())
+                    fields = self.template.fields
+        )
     
 
 

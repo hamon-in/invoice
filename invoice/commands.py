@@ -231,7 +231,7 @@ class InvoiceCommand(Command):
         template = sess.query(model.InvoiceTemplate).filter(model.InvoiceTemplate.name == self.args['template']).one()
         client = sess.query(model.Client).filter(model.Client.name == self.args['client']).one() 
         
-        fields = template.fields()
+        fields = template.fields
         boilerplate = """# -*- text -*-
 # Local Variables: 
 # eval: (orgtbl-mode) 
@@ -307,7 +307,7 @@ class InvoiceCommand(Command):
         sess.add(invoice)
         sess.commit()
 
-            
+        
 
 
 
