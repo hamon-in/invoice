@@ -220,6 +220,7 @@ class InvoiceCommand(Command):
         super().__init__(args)
         self.sc_handlers = {'add'  : self.add,
                             'generate' : self.generate,
+                            'edit' : self.edit,
                             "rm" : self.rm}
     
     def add(self):
@@ -277,6 +278,36 @@ class InvoiceCommand(Command):
         sess.delete(invoice)
         sess.commit()
 
+    def edit(self):
+        id = self.args["id"]
+        client = self.args["client"]
+        template = self.args["template"]
+        date = self.args["date"]
+        particulars = self.args["particulars"]
+        edit_content = self.args['edit']
+        
+        sess = model.get_session(self.args['db'])
+        invoice = sess.query(model.Invoice).filter(model.Invoice.id == id).one()
+        
+        if client:
+            client = sess.query(model.Client).filter(model.Client.name == client).one()
+            invoice.client = client
+        if template:
+            template  = sess.query(model.Template).filter(model.Template.name == template).one()
+            invoice.template = template
+        if date:
+            invoice.date = datetime.datetime.strptime(date, "%d/%m/%Y")
+        if particulars:
+            invoice.particulars = particulars
+
+        if edit_content:
+            _, data = helpers.get_from_file(invoice.content)
+            invoice.content = data
+
+        sess.add(invoice)
+        sess.commit()
+
+            
 
 
 
