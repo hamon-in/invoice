@@ -52,6 +52,13 @@ class InvoiceTemplate(InvoiceBase,  Base):
         data = yaml.load(self.template)
         return [x.strip() for x in data['rows'].strip().strip("|").split("|")]
 
+    @property
+    def footers(self):
+        data = yaml.load(self.template)
+        footer_rows = data['footer'].strip().split("\n")
+        return [[t.strip() for t in x.strip("|").split("|")] for x in  footer_rows]
+        
+
 class Invoice(InvoiceBase, Base):
     __tablename__ = "invoices"
     id = Column(Integer,  primary_key = True)
@@ -102,7 +109,8 @@ class Invoice(InvoiceBase, Base):
                     particulars = self.particulars,
                     number = invoice_number,
                     fields = self.template.fields,
-                    columns = self.columns)
+                    columns = self.columns,
+                    footers = self.template.footers)
     
 
 
