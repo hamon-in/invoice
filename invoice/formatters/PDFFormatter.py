@@ -51,8 +51,10 @@ class PDFFormatter(Formatter):
 
         # Create top material with number and client address
         content = [Spacer(1, 2*inch)]
+        content.append(Paragraph("<b>Date: </b>{}".format(date), self.styles['to_address']))
+        content.append(Spacer(1, 0.25*inch))
         content.append(Paragraph("<b>Invoice Number: </b>{}".format(number), self.styles['to_address']))
-        content.append(Spacer(1, 0.5*inch))
+        content.append(Spacer(1, 0.25*inch))
         content.append(Paragraph("<b>Bill to:</b>", self.styles['to_address']))
         for i in client_address.split("\n"):
             content.append(Paragraph(i, self.styles['to_address']))
