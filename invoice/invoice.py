@@ -41,8 +41,10 @@ def parse_args():
     account_add_parser.add_argument("-e", "--email", help = "Email address", required = True)
     account_add_parser.add_argument("--pan", help = "Pan number")
     account_add_parser.add_argument("--serv", help = "Service tax number")
-    account_add_parser.add_argument("--acc", help = "Bank account number")
+    account_add_parser.add_argument("--bank-details", required = True, help = "Bank details. Must include bank name, address, account number, account holders name, IFSC code and any other details.")
+
     account_add_parser.add_argument("--prefix", help = "Invoice number prefix")
+
     account_add_parser = account_subparsers.add_parser("list", help = "List accounts")
 
     client_parser = subparsers.add_parser("client", help = "Manage clients")

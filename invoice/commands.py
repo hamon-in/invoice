@@ -181,7 +181,7 @@ class AccountCommand(Command):
                                 email = self.args['email'],
                                 pan = self.args['pan'],                                
                                 serv_tax_num = self.args['serv'],
-                                bank_account_num = self.args['acc'],
+                                bank_details = self.args['bank_details'],
                                 prefix = self.args['prefix'])
         sess = model.get_session(self.args['db'])
         sess.add(account)

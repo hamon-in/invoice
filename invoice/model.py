@@ -30,7 +30,7 @@ class Account(InvoiceBase, Base):
     email = Column(String(30))
     pan = Column(String(10))
     serv_tax_num = Column(String(10))
-    bank_account_num = Column(String(20))
+    bank_details = Column(String(500))
     prefix = Column(String(10))
     clients = relationship('Client', backref="account")
 
