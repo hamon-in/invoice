@@ -122,7 +122,8 @@ class Invoice(InvoiceBase, Base):
                     fields = self.template.fields,
                     columns = self.columns,
                     footers = self.template.footers,
-                    taxes = self.template.taxes)
+                    taxes = self.template.taxes,
+                    bank_details = self.client.account.bank_details)
     
 
 

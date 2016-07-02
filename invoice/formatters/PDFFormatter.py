@@ -37,7 +37,7 @@ class PDFFormatter(Formatter):
 
     def create_invoice_layer(self, invoice_data):
         client_address = invoice_data['client_address'].encode('utf-8').decode('unicode_escape')
-
+        bank_details = invoice_data['bank_details'].encode('utf-8').decode('unicode_escape')
         date = invoice_data['date']
         number = invoice_data['number']
         particulars = invoice_data['particulars']
@@ -102,6 +102,13 @@ class PDFFormatter(Formatter):
             columns.append(c1)
 
         content.append(Table(columns, style = list_style))
+
+        content.append(Spacer(1, 0.5*inch))
+        content.append(Paragraph("<b>Payment details:</b>", self.styles['to_address']))
+        for i in bank_details.split("\n"):
+            content.append(Paragraph(i, self.styles['to_address']))
+
+
         doc.build(content)
         return packet
 
