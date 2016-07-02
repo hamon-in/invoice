@@ -87,9 +87,9 @@ class TemplateCommand(Command):
 
 # Remove taxes that you don't need
 taxes:
-     - service: 0.12
-     - kk_cess: 0.5
-     - sb_cess: 0.5
+   service: 0.12
+   kk_cess: 0.5
+   sb_cess: 0.5
 
 
 rows: |
