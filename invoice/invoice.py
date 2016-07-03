@@ -124,10 +124,13 @@ def parse_args():
 def dispatch(args):
     cmd = args.command if hasattr(args, "command") else ""
     l.debug("Command is '%s'", cmd)
-    dispatcher = commands.get_commands()
-    command_class = dispatcher[cmd]
-    command_handler = command_class(args)
     try:
+        dispatcher = commands.get_commands()
+        command_class = dispatcher[cmd]
+        try:
+            command_handler = command_class(args)
+        except TypeError:
+            sys.exit(-1)
         command_handler()
     except NoResultFound:
         sys.exit(-1)
