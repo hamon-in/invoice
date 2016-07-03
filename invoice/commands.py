@@ -4,10 +4,12 @@ import logging
 import os
 
 import yaml
+from sqlalchemy.orm.exc import NoResultFound
 
 from . import model
 from . import helpers
 from . import formatters
+
 
 class Command:
     def __init__(self, args):
@@ -132,7 +134,11 @@ footer: |
 
     def edit(self):
         sess = model.get_session(self.args['db'])
-        template = sess.query(model.InvoiceTemplate).filter(model.InvoiceTemplate.name==self.args['name']).one()
+        try:
+            template = sess.query(model.InvoiceTemplate).filter(model.InvoiceTemplate.name==self.args['name']).one()
+        except NoResultFound:
+            self.l.critical("No such template '%s'",self.args['name'])
+            raise 
         if 'desc' in self.args:
             template.description = self.args['desc']
             self.l.debug("Description of %s updated", self.args['name'])
@@ -158,7 +164,11 @@ footer: |
         
     def rm(self):
         sess = model.get_session(self.args['db'])
-        template = sess.query(model.InvoiceTemplate).filter(model.InvoiceTemplate.name==self.args['name']).one()
+        try:
+            template = sess.query(model.InvoiceTemplate).filter(model.InvoiceTemplate.name==self.args['name']).one()
+        except NoResultFound:
+            self.l.critical("No such template '%s'", self.args['name'])
+            raise
         sess.delete(template)
         sess.commit()
 
@@ -201,8 +211,12 @@ class ClientCommand(Command):
 
     def add_client(self):
         sess = model.get_session(self.args['db'])
-        account = sess.query(model.Account).filter(model.Account.name == self.args['account']).one()
-        print (account)
+        try:
+            account = sess.query(model.Account).filter(model.Account.name == self.args['account']).one()
+        except NoResultFound:
+            self.l.critical("No such account '%s'", self.args['account'])
+            raise
+
         client = model.Client(name = self.args['name'],
                               address = self.args['address'],
                               account = account)
@@ -232,8 +246,16 @@ class InvoiceCommand(Command):
         sess = model.get_session(self.args['db'])
         date = datetime.datetime.strptime(self.args['date'], "%d/%m/%Y")
         subject = self.args['particulars']
-        template = sess.query(model.InvoiceTemplate).filter(model.InvoiceTemplate.name == self.args['template']).one()
-        client = sess.query(model.Client).filter(model.Client.name == self.args['client']).one() 
+        try:
+            template = sess.query(model.InvoiceTemplate).filter(model.InvoiceTemplate.name == self.args['template']).one()
+        except NoResultFound:
+            self.l.critical("No such template '%s'", self.args['template'])
+            raise
+        try:
+            client = sess.query(model.Client).filter(model.Client.name == self.args['client']).one() 
+        except NoResultFound:
+            self.l.critical("No such client '%s'", self.args['client'])
+            raise
         
         fields = template.fields
         boilerplate = """# -*- text -*-
@@ -265,8 +287,9 @@ class InvoiceCommand(Command):
         date_start = datetime.datetime.strptime(self.args['from'], "%d/%m/%Y")
         date_to = datetime.datetime.strptime(self.args['to'], "%d/%m/%Y")
         fmt_name = self.args['format']
-        self.l.info("Invoices between %s and %s", self.args['from'], self.args['to'])
+        formatter = self.formatters[fmt_name]()
 
+        self.l.info("Invoices between %s and %s", self.args['from'], self.args['to'])
         invoices = sess.query(model.Invoice).join(model.Client).filter(model.Client.name == self.args['client'],
                                                                        date_start <= model.Invoice.date,
                                                                        model.Invoice.date <= date_to).all()
@@ -277,8 +300,12 @@ class InvoiceCommand(Command):
 
     def rm(self):
         sess = model.get_session(self.args['db'])
-        id = self.args['id']
-        invoice = sess.query(model.Invoice).filter(model.Invoice.id == id).one()
+        id_ = self.args['id']
+        try:
+            invoice = sess.query(model.Invoice).filter(model.Invoice.id == id_).one()
+        except NoResultFound:
+            self.l.critical("No invoice with id %s", id_)
+            raise
         sess.delete(invoice)
         sess.commit()
 
@@ -291,14 +318,27 @@ class InvoiceCommand(Command):
         edit_content = self.args['edit']
         
         sess = model.get_session(self.args['db'])
-        invoice = sess.query(model.Invoice).filter(model.Invoice.id == id).one()
-        
+        try:
+            invoice = sess.query(model.Invoice).filter(model.Invoice.id == id).one()
+        except NoResultFound:
+            self.l.critical("No invoice with id %s", id)
+            raise
+
         if client:
-            client = sess.query(model.Client).filter(model.Client.name == client).one()
-            invoice.client = client
+            try:
+                client = sess.query(model.Client).filter(model.Client.name == client).one()
+                invoice.client = client
+            except NoResultFound:
+                self.l.critical("No such client '%s'", client)
+                raise
+
         if template:
-            template  = sess.query(model.Template).filter(model.Template.name == template).one()
-            invoice.template = template
+            try:
+                template  = sess.query(model.InvoiceTemplate).filter(model.InvoiceTemplate.name == template).one()
+                invoice.template = template
+            except NoResultFound:
+                self.l.critical("No such template '%s'", template)
+                raise
         if date:
             invoice.date = datetime.datetime.strptime(date, "%d/%m/%Y")
         if particulars:

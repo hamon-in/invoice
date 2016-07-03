@@ -1,6 +1,9 @@
 import argparse
 import datetime
 import logging
+import sys
+
+from sqlalchemy.orm.exc import NoResultFound
 
 from . import model
 from . import commands
@@ -123,7 +126,10 @@ def dispatch(args):
     dispatcher = commands.get_commands()
     command_class = dispatcher[cmd]
     command_handler = command_class(args)
-    command_handler()
+    try:
+        command_handler()
+    except NoResultFound:
+        sys.exit(-1)
 
 def main():
     setup_logging()
