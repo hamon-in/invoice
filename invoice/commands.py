@@ -293,10 +293,12 @@ class InvoiceCommand(Command):
         invoices = sess.query(model.Invoice).join(model.Client).filter(model.Client.name == self.args['client'],
                                                                        date_start <= model.Invoice.date,
                                                                        model.Invoice.date <= date_to).all()
-        formatter = self.formatters[fmt_name]()
-        for invoice in invoices:
-            self.l.info("  Generating invoice %s", invoice.file_name)
-            pdf_invoice = formatter.generate(invoice)
+        if invoices:
+            for invoice in invoices:
+                self.l.info("  Generating invoice %s", invoice.file_name)
+                formatter.generate(invoice)
+        else:
+            self.l.critical("No invoices found matching these criteria")
 
     def rm(self):
         sess = model.get_session(self.args['db'])
