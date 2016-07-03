@@ -8,6 +8,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from . import model
 from . import commands
 from . import formatters
+from . import __version__
 
 l = None
 
@@ -133,6 +134,7 @@ def dispatch(args):
 
 def main():
     setup_logging()
+    l.debug("Invoice version '%s'", __version__)
     args = parse_args()
     dispatch(args)
 
