@@ -9,6 +9,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from . import model
 from . import helpers
 from . import formatters
+from . import __version__
 
 
 class Command:
@@ -42,6 +43,10 @@ class InitCommand(Command):
         """
         self.l.debug("Creating database '%s'", self.args['db'])
         model.create_database(self.args['db'])
+        sess = model.get_session(self.args['db'])
+        c = model.Config(name = "version", value = __version__)
+        sess.add(c)
+        sess.commit()
 
 class SummaryCommand(Command):
     def __init__(self, args):
