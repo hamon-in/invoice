@@ -63,7 +63,7 @@ class InitCommand(Command):
         self.l.debug("Creating database '%s'", self.args['db'])
         model.create_database(self.args['db'])
         sess = model.get_session(self.args['db'])
-        c = model.Config(name = "version", value = __version__)
+        c = model.Config(name = "version", value = __version__, system = True)
         sess.add(c)
         sess.commit()
 
@@ -76,7 +76,8 @@ class SummaryCommand(Command):
 
         self.l.info("Config:")
         for i in sess.query(model.Config).all():
-            self.l.info("%10s:%10s", i.name, i.value)
+            system = "*" if i.system else ''
+            self.l.info("%s %10s:%10s", system, i.name, i.value)
         self.l.info("-"*20)
         
         for account in sess.query(model.Account).all():

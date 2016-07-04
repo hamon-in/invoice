@@ -1,7 +1,7 @@
 from decimal import Decimal
 
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, String, Integer, create_engine, ForeignKey, BLOB, Date
+from sqlalchemy import Column, String, Integer, create_engine, ForeignKey, BLOB, Date, Boolean
 from sqlalchemy.orm import sessionmaker, relationship
 
 import yaml
@@ -20,6 +20,7 @@ class Config(InvoiceBase, Base):
     id = Column(Integer, primary_key = True)
     name = Column(String(50), unique = True)
     value = Column(String(100))
+    system = Column(Boolean())
 
 class Account(InvoiceBase, Base):
     __tablename__ = "accounts"
