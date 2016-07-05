@@ -200,11 +200,11 @@ footer: |
 class AccountCommand(Command):
     def __init__(self, args):
         super().__init__(args)
-        self.sc_handlers = {'add'  : self.add_account,
-                            'list' : self.list_accounts,
-                            'edit' : self.edit_account}
+        self.sc_handlers = {'add'  : self.add,
+                            'list' : self.list,
+                            'edit' : self.edit}
 
-    def edit_account(self):
+    def edit(self):
         name = self.args["name"]
         address = self.args["address"]
         phone = self.args["phone"]
@@ -239,7 +239,7 @@ class AccountCommand(Command):
         sess.add(account)
         sess.commit()
 
-    def add_account(self):
+    def add(self):
         account = model.Account(name = self.args['name'],
                                 address = self.args['address'],
                                 phone = self.args['phone'],
@@ -252,7 +252,7 @@ class AccountCommand(Command):
         sess.add(account)
         sess.commit()
 
-    def list_accounts(self):
+    def list(self):
         sess = model.get_session(self.args['db'])
         self.l.info("Accounts")
         for i in sess.query(model.Account).all():
