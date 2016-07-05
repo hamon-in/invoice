@@ -13,20 +13,16 @@ from . import __version__
 
 
 class Command:
-    def __init__(self, args):
+    def __init__(self, args, db_init = True):
         envars_config = {k.replace("INVOICE_", "").lower():v 
                          for k,v in os.environ.items() 
                          if k.startswith("INVOICE_")}
         self.args = ChainMap(args.__dict__, envars_config)
         self.l = logging.getLogger("invoice")
         self.formatters = formatters.get_formatters()
-        try:
-            self.db_check
-        except AttributeError:
-            self.db_check = True
-        
+
         # Check database version
-        if self.db_check:
+        if db_init:
             sess = model.get_session(self.args['db'])
             try:
                 db_version = sess.query(model.Config).filter(model.Config.name == "version").one().value
@@ -53,8 +49,7 @@ class Command:
 
 class InitCommand(Command):
     def __init__(self, args):
-        self.db_check = False
-        super().__init__(args)
+        super().__init__(args, db_init = False)
 
     def __call__(self):
         """
