@@ -201,8 +201,43 @@ class AccountCommand(Command):
     def __init__(self, args):
         super().__init__(args)
         self.sc_handlers = {'add'  : self.add_account,
-                            'list' : self.list_accounts}
+                            'list' : self.list_accounts,
+                            'edit' : self.edit_account}
 
+    def edit_account(self):
+        name = self.args["name"]
+        address = self.args["address"]
+        phone = self.args["phone"]
+        email = self.args["email"]
+        pan = self.args["pan"]
+        serv = self.args["serv"]
+        bank_details = self.args["bank_details"]
+        prefix = self.args["prefix"]
+
+        sess = model.get_session(self.args['db'])
+        try:
+            account = sess.query(model.Account).filter(model.Account.name == name).one()
+        except NoResultFound:
+            self.l.critical("No account with name %s", name)
+            raise
+
+        if address:
+            account.address = address
+        if phone:
+            account.phone = phone
+        if email:
+            account.email = email
+        if pan:
+            account.pan = pan
+        if serv:
+            account.serv_tax_num = serv
+        if bank_details:
+            account.bank_details = bank_details
+        if prefix:
+            account.prefix = prefix
+
+        sess.add(account)
+        sess.commit()
 
     def add_account(self):
         account = model.Account(name = self.args['name'],

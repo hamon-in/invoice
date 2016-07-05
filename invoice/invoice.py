@@ -38,6 +38,16 @@ def parse_args():
                                                        metavar = "<Account operation>", 
                                                        help="Commands to manipulate accounts")
     account_subparsers.required = True
+    account_edit_parser = account_subparsers.add_parser("edit", help = "Edit an existing account")
+    account_edit_parser.add_argument("-n", "--name", help = "Name of account", required = True)
+    account_edit_parser.add_argument("-a", "--address", help = "Billing address account")
+    account_edit_parser.add_argument("-p", "--phone", help = "Phone number")
+    account_edit_parser.add_argument("-e", "--email", help = "Email address")
+    account_edit_parser.add_argument("--pan", help = "Pan number")
+    account_edit_parser.add_argument("--serv", help = "Service tax number")
+    account_edit_parser.add_argument("--bank-details", help = "Bank details. Must include bank name, address, account number, account holders name, IFSC code and any other details.")
+    account_edit_parser.add_argument("--prefix", help = "Invoice number prefix")
+
     account_add_parser = account_subparsers.add_parser("add", help = "Create a new account")
     account_add_parser.add_argument("-n", "--name", help = "Name of account", required = True)
     account_add_parser.add_argument("-a", "--address", help = "Billing address account", required = True)
@@ -46,7 +56,6 @@ def parse_args():
     account_add_parser.add_argument("--pan", help = "Pan number")
     account_add_parser.add_argument("--serv", help = "Service tax number")
     account_add_parser.add_argument("--bank-details", required = True, help = "Bank details. Must include bank name, address, account number, account holders name, IFSC code and any other details.")
-
     account_add_parser.add_argument("--prefix", help = "Invoice number prefix")
 
     account_add_parser = account_subparsers.add_parser("list", help = "List accounts")
