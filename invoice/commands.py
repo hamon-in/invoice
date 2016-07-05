@@ -5,6 +5,7 @@ import os
 
 import yaml
 from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.exc import IntegrityError
 
 from . import model
 from . import helpers
@@ -58,9 +59,12 @@ class InitCommand(Command):
         self.l.debug("Creating database '%s'", self.args['db'])
         model.create_database(self.args['db'])
         sess = model.get_session(self.args['db'])
-        c = model.Config(name = "version", value = __version__, system = True)
-        sess.add(c)
-        sess.commit()
+        try:
+            c = model.Config(name = "version", value = __version__, system = True)
+            sess.add(c)
+            sess.commit()
+        except IntegrityError:
+            self.l.debug("Reinitialising database. Not changing version")
 
 class SummaryCommand(Command):
     def __init__(self, args):
