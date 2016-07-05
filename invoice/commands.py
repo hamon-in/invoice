@@ -294,8 +294,14 @@ class InvoiceCommand(Command):
         self.sc_handlers = {'add'  : self.add,
                             'generate' : self.generate,
                             'edit' : self.edit,
-                            "rm" : self.rm}
+                            "rm" : self.rm, 
+                            "list" : self.list}
     
+    def list(self):
+        sess = model.get_session(self.args['db'])
+        for invoice in sess.query(model.Invoice).all():
+            self.l.info("     %s | %s | %s", invoice.id, invoice.date.strftime("%d/%m/%Y") , invoice.particulars)
+        
     def add(self):
         self.l.debug("Adding invoice")
         sess = model.get_session(self.args['db'])

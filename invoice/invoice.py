@@ -92,6 +92,7 @@ def parse_args():
                                                       metavar = "<Invoice operation>",
                                                       help = "Commands to manipulate invoices")
     invoice_subparsers.required = True
+    invoice_list_parser = invoice_subparsers.add_parser("list", help = "List invoices")
     invoice_add_parser = invoice_subparsers.add_parser("add", help = "Add a new invoice")
     invoice_add_parser.add_argument("-c", "--client", required = True, help = "Which client this invoice is for")
     invoice_add_parser.add_argument("-t", "--template", required = True, help = "Which template to use for this invoice")
