@@ -304,7 +304,8 @@ class InvoiceCommand(Command):
     def list(self):
         sess = model.get_session(self.args['db'])
         for invoice in sess.query(model.Invoice).all():
-            self.l.info("     %s | %s | %s", invoice.id, invoice.date.strftime("%d/%m/%Y") , invoice.particulars)
+            tags = ", ".join (x.name for x in invoice.tags)
+            self.l.info("     %s | %s | %s | %s ", invoice.id, invoice.date.strftime("%d/%m/%Y") , invoice.particulars, tags)
         
     def add(self):
         self.l.debug("Adding invoice")

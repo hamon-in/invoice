@@ -1,7 +1,7 @@
 from decimal import Decimal
 
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, String, Integer, create_engine, ForeignKey, BLOB, Date, Boolean
+from sqlalchemy import Column, String, Integer, create_engine, ForeignKey, BLOB, Date, Boolean, Table
 from sqlalchemy.orm import sessionmaker, relationship
 
 import yaml
@@ -42,6 +42,8 @@ class Client(InvoiceBase, Base):
     account_id = Column(Integer, ForeignKey('accounts.id'))
     invoices = relationship("Invoice", back_populates="client")
     
+
+
 class InvoiceTemplate(InvoiceBase,  Base):
     __tablename__ = "templates"
     name = Column(String(50), primary_key = True)
@@ -65,7 +67,15 @@ class InvoiceTemplate(InvoiceBase,  Base):
         data = yaml.load(self.template)
         footer_rows = data['footer'].strip().split("\n")
         return [[t.strip() for t in x.strip("|").split("|")] for x in  footer_rows]
+
+association_table = Table('invoice_tag', Base.metadata,
+    Column('invoice_id', Integer, ForeignKey('invoices.id')),
+    Column('tag_name', Integer, ForeignKey('invoicetags.name')))
         
+class InvoiceTag(InvoiceBase, Base):
+    __tablename__ = "invoicetags"
+    name = Column(String, primary_key = True)
+    invoices = relationship('Invoice', secondary=association_table, back_populates="tags")
 
 class Invoice(InvoiceBase, Base):
     __tablename__ = "invoices"
@@ -77,6 +87,7 @@ class Invoice(InvoiceBase, Base):
     template_id = Column(String, ForeignKey('templates.name'))
     client_id = Column(String,  ForeignKey('clients.name'))
     content = Column(String)
+    tags = relationship('InvoiceTag', secondary=association_table, back_populates="invoices")
 
     @property
     def file_name(self):
