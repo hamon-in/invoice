@@ -420,7 +420,40 @@ class InvoiceCommand(Command):
         sess.commit()
 
         
+class TagCommand(Command):
+    def __init__(self, args):
+        super().__init__(args)
+        self.sc_handlers = {'add'  : self.add,
+                            'rm' : self.rm,
+                            "list" : self.list}
+                            # 'edit' : self.edit,
+                            # "rm" : self.rm, 
+                            # }
 
+    def list(self):
+        sess = model.get_session(self.args['db'])
+        self.l.info("Tags:")
+        for t in sess.query(model.InvoiceTag).all():
+            self.l.info(" %s %s", t.name, "*" if t.system else '')
+
+    def add(self):
+        sess = model.get_session(self.args['db'])
+        t = model.InvoiceTag(name = self.args['name'], system = False)
+        sess.add(t)
+        sess.commit()
+        
+    def rm(self):
+        sess = model.get_session(self.args['db'])
+        try:
+            t = sess.query(model.InvoiceTag).filter(model.InvoiceTag.name == self.args['name']).one()
+            if t.system:
+                self.l.warn("Cannot delete system tag %s", self.args['db'])
+            else:
+                sess.delete(t)
+                sess.commit()
+        except NoResultFound:
+            self.l.critical("No such tag '%s'", self.args['name'])
+            raise
 
 
 
@@ -430,4 +463,5 @@ def get_commands():
             "client"   : ClientCommand,
             "template" : TemplateCommand,
             "summary"  : SummaryCommand,
-            "invoice"  : InvoiceCommand}
+            "invoice"  : InvoiceCommand,
+            "tag"      : TagCommand}

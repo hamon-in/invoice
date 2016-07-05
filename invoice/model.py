@@ -76,6 +76,7 @@ class InvoiceTag(InvoiceBase, Base):
     __tablename__ = "invoicetags"
     name = Column(String, primary_key = True)
     invoices = relationship('Invoice', secondary=association_table, back_populates="tags")
+    system = Column(Boolean(), default = False)
 
 class Invoice(InvoiceBase, Base):
     __tablename__ = "invoices"

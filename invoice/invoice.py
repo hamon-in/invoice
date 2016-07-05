@@ -127,6 +127,21 @@ def parse_args():
                                          required = True,
                                          help = "Which client to generate invoices for.")
 
+    tag_parser = subparsers.add_parser("tag", help = "Manage invoice tags")
+    tag_subparsers = tag_parser.add_subparsers(title = "Tag commands", dest = "op",
+                                                metavar = "<Tag operation>",
+                                                help = "Commands to manipulate invoice tags")
+    tag_subparsers.required = True
+    tag_add_parser = tag_subparsers.add_parser("add", help = "Create a new tag")
+    tag_add_parser.add_argument("-n", "--name",
+                                   required = True,
+                                   help = "Name of new tag to add")
+    tag_rm_parser = tag_subparsers.add_parser("rm", help = "Delete an existing tag")
+    tag_rm_parser.add_argument("-n", "--name",
+                                required = True,
+                                help = "Name of new tag to delete")
+    tag_list_parser = tag_subparsers.add_parser("list", help = "List all tags")
+
     args = parser.parse_args()
     return args
 
