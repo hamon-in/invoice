@@ -120,6 +120,10 @@ def parse_args():
     invoice_edit_parser.add_argument("-d", "--date", help = "Change invoice date (dd/mm/yyyy)")
     invoice_edit_parser.add_argument("-p", "--particulars", help = "Subject line for this invoice")
     invoice_edit_parser.add_argument("-e", "--edit", action = "store_true", default = False, help = "Edit actual invoice content")
+    tag_group = invoice_edit_parser.add_mutually_exclusive_group()
+    tag_group.add_argument("-a", "--add-tags", action = "append", help = "Tags to add to the invoice. Can be specified multiple times.")
+    tag_group.add_argument("-r", "--replace-tags", action = "append", help = "Tags attached to the invoice will be replaced by these. Can be specified multiple times.")
+    
 
     default_from = datetime.date.today().replace(day = 1).strftime("%d/%m/%Y")
     default_to = datetime.date.today().strftime("%d/%m/%Y")

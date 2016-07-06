@@ -6,6 +6,7 @@ import os
 import yaml
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy import or_
 
 from . import model
 from . import helpers
@@ -378,19 +379,40 @@ class InvoiceCommand(Command):
         sess.commit()
 
     def edit(self):
+        sess = model.get_session(self.args['db'])
         id = self.args["id"]
         client = self.args["client"]
         template = self.args["template"]
         date = self.args["date"]
         particulars = self.args["particulars"]
         edit_content = self.args['edit']
-        
-        sess = model.get_session(self.args['db'])
+
+        add_tag_names = self.args['add_tags']
+        replace_tag_names = self.args['replace_tags']
+        add_tags = replace_tags = None
+
+        if add_tag_names:
+            add_tags = sess.query(model.InvoiceTag).filter(or_(*[model.InvoiceTag.name == i for i in add_tag_names])).all()
+            if len(add_tag_names) != len(add_tags):
+                self.l.warn("Some of the tags are invalid. Skipping them.")
+
+        if replace_tag_names:
+            replace_tags = sess.query(model.InvoiceTag).filter(or_(*[model.InvoiceTag.name == i for i in replace_tag_names])).all()
+            if len(replace_tag_names) != len(replace_tags):
+                self.l.warn("Some of the tags are invalid. Skipping them.")
+            
+            
         try:
             invoice = sess.query(model.Invoice).filter(model.Invoice.id == id).one()
         except NoResultFound:
             self.l.critical("No invoice with id %s", id)
             raise
+
+        if add_tags:
+            invoice.tags.extend(add_tags)
+
+        if replace_tags:
+            invoice.tags = replace_tags
 
         if client:
             try:
