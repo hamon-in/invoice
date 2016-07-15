@@ -33,6 +33,17 @@ def parse_args():
 
     summary_parser = subparsers.add_parser("summary", help="Print a summary of the database contents")
 
+    timesheet_parser = subparsers.add_parser("timesheet", help="Manage timesheets")
+    timesheet_subparsers = timesheet_parser.add_subparsers(title = "Timesheet commands", dest="op",
+                                                           metavar = "<Timesheet operation>",
+                                                           help="Commands to manage timesheets")
+    timesheet_add_parser = timesheet_subparsers.add_parser("import", help="Import a new timesheet")
+    timesheet_add_parser.add_argument("-n", "--name", required = True, help="Timesheet name")
+    timesheet_add_parser.add_argument("-d", "--date", default = datetime.date.today().strftime("%d/%m/%Y"), help = "Timesheet date (dd/mm/yyyy): Default is %(default)s")
+    timesheet_add_parser.add_argument("-e", "--employee", required = True, help="Employee name")
+    timesheet_add_parser.add_argument("timesheet")
+
+
     account_parser = subparsers.add_parser("account", help="Manage Accounts")
     account_subparsers = account_parser.add_subparsers(title = "Account commands", dest="op", 
                                                        metavar = "<Account operation>", 

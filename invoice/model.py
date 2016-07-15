@@ -22,6 +22,15 @@ class Config(InvoiceBase, Base):
     value = Column(String(100))
     system = Column(Boolean())
 
+class Timesheet(InvoiceBase, Base):
+    __tablename__ = "timesheets"
+    name = Column(String(50), primary_key = True)
+    employee = Column(String(50))
+    date = Column(Date)
+    data = Column(String(1000))
+    
+    
+
 class Account(InvoiceBase, Base):
     __tablename__ = "accounts"
     id = Column(Integer, primary_key = True)

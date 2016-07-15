@@ -455,6 +455,26 @@ class TagCommand(Command):
             self.l.critical("No such tag '%s'", self.args['name'])
             raise
 
+class TimesheetCommand(Command):
+    def __init__(self, args):
+        super().__init__(args)
+        self.sc_handlers = {'import'  : self.import_}
+
+    def import_(self):
+        name = self.args['name']
+        date = datetime.datetime.strptime(self.args['date'], "%d/%m/%Y")
+        employee = self.args['employee']
+        with open(self.args['timesheet']) as f:
+            timesheet = f.read()
+
+        sess = model.get_session(self.args['db'])
+        t = model.Timesheet(name = name, 
+                            employee = employee,
+                            date = date,
+                            data = timesheet)
+        sess.add(t)
+        sess.commit()
+
 
 
 def get_commands():
@@ -464,4 +484,5 @@ def get_commands():
             "template" : TemplateCommand,
             "summary"  : SummaryCommand,
             "invoice"  : InvoiceCommand,
-            "tag"      : TagCommand}
+            "tag"      : TagCommand,
+            "timesheet": TimesheetCommand}
