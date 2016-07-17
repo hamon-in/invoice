@@ -24,6 +24,9 @@ def setup_logging(level = logging.DEBUG):
 
 def parse_args():
     available_formats = formatters.get_formatters()
+    default_from = datetime.date.today().replace(day = 1).strftime("%d/%m/%Y")
+    default_to = datetime.date.today().strftime("%d/%m/%Y")
+
     parser = argparse.ArgumentParser(description = "Manage invoices")
     parser.add_argument("-f", "--file" , dest = "db", help = "Name of database file", default=argparse.SUPPRESS)
     subparsers = parser.add_subparsers(title="Commands", dest="command", help = "Commands available")
@@ -104,6 +107,20 @@ def parse_args():
                                                       help = "Commands to manipulate invoices")
     invoice_subparsers.required = True
     invoice_list_parser = invoice_subparsers.add_parser("list", help = "List invoices")
+    invoice_list_parser.add_argument("-f", "--from", 
+                                     default = default_from,
+                                     help = "Show only invoices since this date (dd/mm/yyyy). Default is %(default)s")
+    invoice_list_parser.add_argument("-t", "--to",
+                                     default = default_to,
+                                     help = "Show only invoices till this date (dd/mm/yyyy). Default is %(default)s")
+    invoice_list_parser.add_argument("-c", "--client",
+                                     help = "Show only invoices for this client")
+    invoice_list_parser.add_argument("-g", "--tag",
+                                     action = "append",
+                                     help = "Show only invoices with these tags. Can be given multiple times.")
+    
+    
+
     invoice_add_parser = invoice_subparsers.add_parser("add", help = "Add a new invoice")
     invoice_add_parser.add_argument("-c", "--client", required = True, help = "Which client this invoice is for")
     invoice_add_parser.add_argument("-t", "--template", required = True, help = "Which template to use for this invoice")
@@ -125,8 +142,6 @@ def parse_args():
     tag_group.add_argument("-r", "--replace-tags", action = "append", help = "Tags attached to the invoice will be replaced by these. Can be specified multiple times.")
     
 
-    default_from = datetime.date.today().replace(day = 1).strftime("%d/%m/%Y")
-    default_to = datetime.date.today().strftime("%d/%m/%Y")
     invoice_generate_parser.add_argument("-f", "--from", 
                                          default = default_from,
                                          help = "Generate all invoices since this date (dd/mm/yyyy). Default is %(default)s")
