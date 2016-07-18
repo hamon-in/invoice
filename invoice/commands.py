@@ -550,15 +550,24 @@ class TimesheetCommand(Command):
         date = datetime.datetime.strptime(self.args['date'], "%d/%m/%Y")
         description = self.args['description']
         employee = self.args['employee']
+        template = self.args['template']
+        try:
+            template = sess.query(model.InvoiceTemplate).filter(model.InvoiceTemplate.name == template).one()
+        except NoResultFound:
+            self.l.critical("No such template '%s'", template)
+            raise
+
         try:
             client = sess.query(model.Client).filter(model.Client.name == self.args['client']).one()
         except NoResultFound:
             self.l.critical("No such client '%s'", client)
             raise
+
         with open(self.args['timesheet']) as f:
             timesheet = self.parse_timesheet(f)
 
         t = model.Timesheet(employee = employee,
+                            template = template,
                             description = description,
                             client = client,
                             date = date,

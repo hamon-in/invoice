@@ -46,6 +46,7 @@ def parse_args():
     timesheet_import_parser.add_argument("-e", "--employee", required = True, help="Employee name")
     timesheet_import_parser.add_argument("-c", "--client", required = True, help="Client name")
     timesheet_import_parser.add_argument("-s", "--description", required = True, help="Description of timesheet")
+    timesheet_import_parser.add_argument("-t", "--template", required = True, help="Template to use")
     timesheet_import_parser.add_argument("timesheet")
 
     timesheet_generate_parser = timesheet_subparsers.add_parser("generate", help = "Generate a timesheet")

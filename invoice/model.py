@@ -53,6 +53,7 @@ class InvoiceTemplate(InvoiceBase,  Base):
     description = Column(String(200))
     template = Column(String(500))
     invoices = relationship("Invoice", back_populates="template")
+    timesheets = relationship("Timesheet", back_populates="template")
     letterhead = Column(BLOB(1024*1024))
 
     @property
@@ -84,6 +85,8 @@ class InvoiceTag(InvoiceBase, Base):
 class Timesheet(InvoiceBase, Base):
     __tablename__ = "timesheets"
     id = Column(Integer, primary_key = True)
+    template_id = Column(String, ForeignKey('templates.name'))
+    template = relationship('InvoiceTemplate')
     client_id = Column(String,  ForeignKey('clients.name'))
     employee = Column(String(50))
     description = Column(String(100))
@@ -101,10 +104,10 @@ class Invoice(InvoiceBase, Base):
     __tablename__ = "invoices"
     id = Column(Integer,  primary_key = True)
     date = Column(Date)
+    template_id = Column(String, ForeignKey('templates.name'))
     template = relationship('InvoiceTemplate')
     particulars = Column(String)
     client = relationship('Client')
-    template_id = Column(String, ForeignKey('templates.name'))
     client_id = Column(String,  ForeignKey('clients.name'))
     content = Column(String)
     tags = relationship('InvoiceTag', secondary=association_table, back_populates="invoices")
