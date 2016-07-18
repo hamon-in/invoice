@@ -371,7 +371,7 @@ class InvoiceCommand(Command):
         if invoices:
             for invoice in invoices:
                 self.l.info("  Generating invoice %s", invoice.file_name)
-                formatter.generate(invoice)
+                formatter.generate_invoice(invoice)
         else:
             self.l.critical("No invoices found matching these criteria")
 

@@ -112,21 +112,23 @@ class PDFFormatter(Formatter):
         doc.build(content)
         return packet
 
-    def generate(self, invoice):
-        invoice_layer = self.create_invoice_layer(invoice.serialise())
-
+    def add_to_letterhead(self, data, letterhead):
         #move to the beginning of the StringIO buffer
-        new_pdf = PdfFileReader(invoice_layer)
+        new_pdf = PdfFileReader(data)
         # read your existing PDF
         
-        existing_pdf = PdfFileReader(io.BytesIO(invoice.template.letterhead))
+        existing_pdf = PdfFileReader(io.BytesIO(letterhead))
         output = PdfFileWriter()
         # add the "watermark" (which is the new pdf) on the existing page
         page = existing_pdf.getPage(0)
         page.mergePage(new_pdf.getPage(0))
         output.addPage(page)
-        # finally, write "output" to a real file
+        return output
+    def generate_invoice(self, invoice):
+        invoice_layer = self.create_invoice_layer(invoice.serialise())
+        final_invoice = self.add_to_letterhead(invoice_layer, invoice.template.letterhead)
+
         outputStream = open(invoice.file_name+".pdf", "wb")
-        output.write(outputStream)
+        final_invoice.write(outputStream)
         outputStream.close()
 
