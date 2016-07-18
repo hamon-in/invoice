@@ -30,6 +30,12 @@ class PDFFormatter(Formatter):
                            to_address = ParagraphStyle("to_address", fontName = "Times-Italic", leading = 12,
                                                        fontSize = 10, alignment = TA_LEFT),
 
+                           table_header = ParagraphStyle("table_header", fontName = "Times-Roman", leading = 12,
+                                                         fontSize = 10, alignment = TA_CENTER),
+
+                           table_small = ParagraphStyle("table_header", fontName = "Times-Roman", leading = 12,
+                                                         fontSize = 8, alignment = TA_CENTER),
+
                            regular = ParagraphStyle("to_address", fontName = "Times-Roman", leading = 12,
                                                     fontSize = 10, alignment = TA_RIGHT)
           )
@@ -124,6 +130,67 @@ class PDFFormatter(Formatter):
         page.mergePage(new_pdf.getPage(0))
         output.addPage(page)
         return output
+
+    def create_timesheet_layer(self, timesheet_data):
+        data = timesheet_data['data']
+        client = timesheet_data['client']
+        date = timesheet_data['date']
+        employee = timesheet_data['emp']
+        description = timesheet_data['desc']
+        
+        packet = io.BytesIO()
+        doc = SimpleDocTemplate(packet)
+
+        # Create top material with number and client address
+        content = [Spacer(1, 1.25*inch)]
+
+        content.append(Paragraph("<b>Date: </b>{}".format(date), self.styles['to_address']))
+        content.append(Spacer(1, 0.25*inch))
+        content.append(Paragraph("<b>Description: </b>{}".format(description), self.styles['to_address']))
+        content.append(Spacer(1, 0.25*inch))
+
+        columns = [[Paragraph("<b>%s</b>"%x, self.styles['table_header']) for x in ["Date","Hours"]]]
+        list_style = TableStyle(
+            [('LINEABOVE', (0,0), (-1,0), 1, colors.black),
+             ('LINEBELOW', (0,0), (-1,0), 1, colors.black),
+             ('BACKGROUND',(0,0), (-1,0), colors.grey),
+
+             # ('ALIGN' ,(-1,1), (-1,-1), 'RIGHT'),
+             ('ALIGN' ,(0,0), (-1,0), 'CENTER'),
+
+             ('LINEABOVE', (0,1), (-1,-1), 0.25, colors.black),
+             ('BACKGROUND' ,(0,-1), (-1,-1), colors.lightgrey),
+             ('LINEBELOW', (0,-1), (-1,-1), 1, colors.black),
+             ('LINEABOVE', (0,-1), (-1,-1), 1, colors.black),
+         ])
+
+        total = sum((Decimal(x[1]) for x in data), Decimal(0)).quantize(Decimal('0.01'))
+        
+        for date, hours in data:
+            columns.append([Paragraph(str(date), self.styles['table_small']),
+                            Paragraph(str(Decimal(hours).quantize(Decimal('0.01'))), self.styles['table_small'])])
+        columns.append([Paragraph("<b>Total hours</b>", self.styles['table_small']), 
+                        Paragraph(str(total), self.styles['table_small'])])
+
+        content.append(Table(columns, colWidths=120, style = list_style, hAlign='LEFT'))
+
+
+
+        doc.build(content)
+        return packet
+
+        
+
+    def generate_timesheet(self, timesheet):
+        timesheet_layer = self.create_timesheet_layer(timesheet.serialise())
+        final_timesheet = self.add_to_letterhead(timesheet_layer, timesheet.template.letterhead)
+
+        outputStream = open(timesheet.file_name+".pdf", "wb")
+        final_timesheet.write(outputStream)
+        outputStream.close()
+        
+
+
     def generate_invoice(self, invoice):
         invoice_layer = self.create_invoice_layer(invoice.serialise())
         final_invoice = self.add_to_letterhead(invoice_layer, invoice.template.letterhead)

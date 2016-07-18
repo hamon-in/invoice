@@ -1,6 +1,6 @@
 import datetime
 from decimal import Decimal
-from collections import ChainMap
+from collections import ChainMap, defaultdict
 import json
 import logging
 import os
@@ -492,11 +492,9 @@ class TimesheetCommand(Command):
                             'generate' : self.generate}
 
     def parse_timesheet(self, data):
-        ret = dict(times = [],
-                   total = None)
+        ret = defaultdict(int)
         day_re = re.compile(r'\*\* \[(\d+)-(\d+)-(\d+) [a-zA-Z]+')
         period_re = re.compile(r'.*CLOCK: \[(\d+)-(\d+)-(\d+) [a-zA-Z]+ (\d+):(\d+)\]--\[(\d+)-(\d+)-(\d+) [a-zA-Z]+ (\d+):(\d+)\] =>  \d+:\d+')
-        times = []
         for i in data:
             day = day_re.search(i)
             period_search = period_re.search(i)
@@ -510,10 +508,7 @@ class TimesheetCommand(Command):
                 t_end = datetime.datetime(year = int(y1), month = int(m1), day = int(d1), 
                                           hour = int(hh1), minute = int(mm1))
                 duration = (t_end - t_start).total_seconds() / (60 * 60)
-                times.append((cday, duration))
-        total = sum((x[1] for x in times))
-        ret['times'] = times
-        ret['total'] = total
+                ret[cday] += duration
         return json.dumps(ret)
 
     def generate(self):
@@ -539,7 +534,7 @@ class TimesheetCommand(Command):
         if timesheets:
             for timesheet in timesheets:
                 self.l.info("  Generating timesheet %s", timesheet.file_name)
-                # formatter.generate(invoice)
+                formatter.generate_timesheet(timesheet)
         else:
             self.l.critical("No timesheet found matching these criteria")
 

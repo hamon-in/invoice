@@ -1,4 +1,6 @@
+import datetime
 from decimal import Decimal
+import json
 
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, String, Integer, create_engine, ForeignKey, BLOB, Date, Boolean, Table
@@ -98,6 +100,15 @@ class Timesheet(InvoiceBase, Base):
     def file_name(self):
         datestr = self.date.strftime("%Y%m%d")
         return "{}-{}-{}".format(datestr, self.client.name, self.description.replace(" ", "-")[:10])
+
+    def serialise(self):
+        data = json.loads(self.data)
+        data = sorted(data.items(), key=lambda x: datetime.datetime.strptime(x[0], '%d/%m/%Y'))
+        return dict(client = self.client.name,
+                    data = data,
+                    date = self.date.strftime("%d %b %Y"),
+                    desc = self.description,
+                    emp = self.employee)
 
 
 class Invoice(InvoiceBase, Base):
