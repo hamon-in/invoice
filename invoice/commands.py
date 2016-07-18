@@ -525,12 +525,12 @@ class TimesheetCommand(Command):
         if employee:
             timesheets = j.filter(model.Client.name == client,
                                   model.Timesheet.employee == employee,
-                                  date_start <= model.Invoice.date,
-                                  model.Invoice.date <= date_to).all()
+                                  date_start <= model.Timesheet.date,
+                                  model.Timesheet.date <= date_to).all()
         else:
             timesheets = j.filter(model.Client.name == client,
-                                  date_start <= model.Invoice.date,
-                                  model.Invoice.date <= date_to).all()
+                                  date_start <= model.Timesheet.date,
+                                  model.Timesheet.date <= date_to).all()
         if timesheets:
             for timesheet in timesheets:
                 self.l.info("  Generating timesheet %s", timesheet.file_name)
