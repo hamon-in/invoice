@@ -1,7 +1,10 @@
 import datetime
+from decimal import Decimal
 from collections import ChainMap
+import json
 import logging
 import os
+import re
 
 import yaml
 from sqlalchemy.orm.exc import NoResultFound
@@ -483,16 +486,51 @@ class TimesheetCommand(Command):
         self.sc_handlers = {'import'  : self.import_,
                             'generate' : self.generate}
 
-    def import_(self):
-        name = self.args['name']
-        date = datetime.datetime.strptime(self.args['date'], "%d/%m/%Y")
-        employee = self.args['employee']
-        with open(self.args['timesheet']) as f:
-            timesheet = f.read()
+    def parse_timesheet(self, data):
+        ret = dict(times = [],
+                   total = None)
+        day_re = re.compile(r'\*\* \[(\d+)-(\d+)-(\d+) [a-zA-Z]+')
+        period_re = re.compile(r'.*CLOCK: \[(\d+)-(\d+)-(\d+) [a-zA-Z]+ (\d+):(\d+)\]--\[(\d+)-(\d+)-(\d+) [a-zA-Z]+ (\d+):(\d+)\] =>  \d+:\d+')
+        times = []
+        for i in data:
+            day = day_re.search(i)
+            period_search = period_re.search(i)
+            if day:
+                y, m, dom = day.groups()
+                cday = datetime.date(day=int(dom), month=int(m), year=int(y)).strftime('%d/%m/%Y')
+            if period_search:
+                y0, m0, d0, hh0, mm0, y1, m1, d1, hh1, mm1 = period_search.groups()
+                t_start = datetime.datetime(year = int(y0), month = int(m0), day = int(d0), 
+                                            hour = int(hh0), minute = int(mm0))
+                t_end = datetime.datetime(year = int(y1), month = int(m1), day = int(d1), 
+                                          hour = int(hh1), minute = int(mm1))
+                duration = (t_end - t_start).total_seconds() / (60 * 60)
+                times.append((cday, duration))
+        total = sum((x[1] for x in times))
+        ret['times'] = times
+        ret['total'] = total
+        return json.dumps(ret)
 
+    def generate(self):
+        pass
+
+    def import_(self):
         sess = model.get_session(self.args['db'])
-        t = model.Timesheet(name = name, 
-                            employee = employee,
+
+        date = datetime.datetime.strptime(self.args['date'], "%d/%m/%Y")
+        description = self.args['description']
+        employee = self.args['employee']
+        try:
+            client = sess.query(model.Client).filter(model.Client.name == self.args['client']).one()
+        except NoResultFound:
+            self.l.critical("No such client '%s'", client)
+            raise
+        with open(self.args['timesheet']) as f:
+            timesheet = self.parse_timesheet(f)
+
+        t = model.Timesheet(employee = employee,
+                            description = description,
+                            client = client,
                             date = date,
                             data = timesheet)
         sess.add(t)
