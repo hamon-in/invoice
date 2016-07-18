@@ -480,7 +480,8 @@ class TagCommand(Command):
 class TimesheetCommand(Command):
     def __init__(self, args):
         super().__init__(args)
-        self.sc_handlers = {'import'  : self.import_}
+        self.sc_handlers = {'import'  : self.import_,
+                            'generate' : self.generate}
 
     def import_(self):
         name = self.args['name']

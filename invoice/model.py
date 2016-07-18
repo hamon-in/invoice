@@ -22,13 +22,6 @@ class Config(InvoiceBase, Base):
     value = Column(String(100))
     system = Column(Boolean())
 
-class Timesheet(InvoiceBase, Base):
-    __tablename__ = "timesheets"
-    name = Column(String(50), primary_key = True)
-    employee = Column(String(50))
-    date = Column(Date)
-    data = Column(String(1000))
-    
     
 
 class Account(InvoiceBase, Base):
@@ -50,6 +43,7 @@ class Client(InvoiceBase, Base):
     address = Column(String(500))
     account_id = Column(Integer, ForeignKey('accounts.id'))
     invoices = relationship("Invoice", back_populates="client")
+    timesheets = relationship("Timesheet", back_populates="client")
     
 
 
@@ -86,6 +80,16 @@ class InvoiceTag(InvoiceBase, Base):
     name = Column(String, primary_key = True)
     invoices = relationship('Invoice', secondary=association_table, back_populates="tags")
     system = Column(Boolean(), default = False)
+
+class Timesheet(InvoiceBase, Base):
+    __tablename__ = "timesheets"
+    id = Column(Integer, primary_key = True)
+    client_id = Column(String,  ForeignKey('clients.name'))
+    employee = Column(String(50))
+    date = Column(Date)
+    data = Column(String(1000))
+    client = relationship('Client')
+    
 
 class Invoice(InvoiceBase, Base):
     __tablename__ = "invoices"

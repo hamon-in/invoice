@@ -46,6 +46,18 @@ def parse_args():
     timesheet_import_parser.add_argument("-e", "--employee", required = True, help="Employee name")
     timesheet_import_parser.add_argument("timesheet")
 
+    timesheet_generate_parser = timesheet_subparsers.add_parser("generate", help = "Generate a timesheet")
+    timesheet_generate_parser.add_argument("-f", "--from", 
+                                           default = default_from,
+                                           help = "Generate all timesheets since this date (dd/mm/yyyy). Default is %(default)s")
+    timesheet_generate_parser.add_argument("-t", "--to",
+                                           default = default_to,
+                                           help = "Generate all timesheets till this date (dd/mm/yyyy). Default is %(default)s")
+    timesheet_generate_parser.add_argument("-c", "--client",
+                                           required = True,
+                                           help = "Which client to generate invoices for.")
+
+
 
     account_parser = subparsers.add_parser("account", help="Manage Accounts")
     account_subparsers = account_parser.add_subparsers(title = "Account commands", dest="op", 
