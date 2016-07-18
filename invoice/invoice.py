@@ -41,6 +41,15 @@ def parse_args():
                                                            metavar = "<Timesheet operation>",
                                                            help="Commands to manage timesheets")
     timesheet_subparsers.required = True
+    timesheet_edit_parser = timesheet_subparsers.add_parser("edit", help="Edit an existing timesheet")
+    timesheet_edit_parser.add_argument("-i", "--id", required = True, help = "Id of timesheet to edit")
+    timesheet_edit_parser.add_argument("-d", "--date", help = "Change timesheet date (dd/mm/yyyy)")
+    timesheet_edit_parser.add_argument("-e", "--employee", help = "Change employee name")
+    timesheet_edit_parser.add_argument("-c", "--client", help="Change timesheet client")
+    timesheet_edit_parser.add_argument("-s", "--description", help="Change timesheet description")
+    timesheet_edit_parser.add_argument("--edit", action="store_true", default = False, help="Edit timesheet data")
+    
+    
     timesheet_import_parser = timesheet_subparsers.add_parser("import", help="Import a new timesheet")
     timesheet_import_parser.add_argument("-d", "--date", default = datetime.date.today().strftime("%d/%m/%Y"), help = "Timesheet date (dd/mm/yyyy): Default is %(default)s")
     timesheet_import_parser.add_argument("-e", "--employee", required = True, help="Employee name")

@@ -110,6 +110,25 @@ class Timesheet(InvoiceBase, Base):
                     desc = self.description,
                     emp = self.employee)
 
+    def to_table(self):
+        data = json.loads(self.data)
+        data = sorted(data.items(), key=lambda x: datetime.datetime.strptime(x[0], '%d/%m/%Y'))
+        org_table = ["| {} | {} |".format(k,Decimal(v).quantize(Decimal('0.01'))) for k,v in data]
+        return "\n".join(org_table)
+        
+    def set_from_table(self, data):
+        data = data.strip()
+        ret = {}
+        for i in (j.strip() for j in data.split("\n")):
+            if i.startswith("#"):
+                continue
+            k,v = [x.strip() for x in i.strip("|").strip().split("|")]
+            ret[k] = v
+        self.data = json.dumps(ret)
+
+            
+                
+
 
 class Invoice(InvoiceBase, Base):
     __tablename__ = "invoices"

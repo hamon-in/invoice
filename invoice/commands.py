@@ -489,7 +489,51 @@ class TimesheetCommand(Command):
     def __init__(self, args):
         super().__init__(args)
         self.sc_handlers = {'import'  : self.import_,
-                            'generate' : self.generate}
+                            'generate' : self.generate,
+                            'edit' : self.edit}
+        
+    def edit(self):
+        ts_id = self.args["id"]
+        date = self.args['date']
+        employee = self.args['employee']
+        client = self.args['client']
+        desc = self.args['description']
+        edit = self.args['edit']
+        
+        sess = model.get_session(self.args['db'])
+        try:
+            timesheet = sess.query(model.Timesheet).filter(model.Timesheet.id == int(ts_id)).one()
+        except NoResultFound:
+            self.l.critical("No such timesheet '%s'", ts_id)
+            raise
+
+        if date:
+            timesheet.date = datetime.datetime.strptime(date, "%d/%m/%Y")
+        if employee:
+            timesheet.employee = employee
+        if desc:
+            timesheet.description = desc
+        if client:
+            try:
+                client = sess.query(model.Client).filter(model.Client.name == client).one()
+                timesheet.client = client
+            except NoResultFound:
+                self.l.critical("No such client '%s'", client)
+                raise
+
+        if edit:
+            template = """# -*- text -*-
+# Local Variables: 
+# eval: (orgtbl-mode) 
+# End:
+#
+{}
+""".format(timesheet.to_table())
+            _, template = helpers.get_from_file(template)
+            timesheet.set_from_table(template)
+            
+        sess.add(timesheet)
+        sess.commit()
 
     def parse_timesheet(self, data):
         ret = defaultdict(int)
