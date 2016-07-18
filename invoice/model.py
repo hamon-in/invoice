@@ -86,6 +86,7 @@ class Timesheet(InvoiceBase, Base):
     id = Column(Integer, primary_key = True)
     client_id = Column(String,  ForeignKey('clients.name'))
     employee = Column(String(50))
+    description = Column(String(100))
     date = Column(Date)
     data = Column(String(1000))
     client = relationship('Client')
