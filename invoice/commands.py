@@ -517,7 +517,32 @@ class TimesheetCommand(Command):
         return json.dumps(ret)
 
     def generate(self):
-        pass
+        sess = model.get_session(self.args['db'])
+        date_start = datetime.datetime.strptime(self.args['from'], "%d/%m/%Y")
+        date_to = datetime.datetime.strptime(self.args['to'], "%d/%m/%Y")
+        fmt_name = self.args['format']
+        formatter = self.formatters[fmt_name]()
+        employee = self.args['employee']
+        client = self.args['client']
+
+        self.l.info("Timesheets between %s and %s", self.args['from'], self.args['to'])
+        j = sess.query(model.Timesheet).join(model.Client)
+        if employee:
+            timesheets = j.filter(model.Client.name == client,
+                                  model.Timesheet.employee == employee,
+                                  date_start <= model.Invoice.date,
+                                  model.Invoice.date <= date_to).all()
+        else:
+            timesheets = j.filter(model.Client.name == client,
+                                  date_start <= model.Invoice.date,
+                                  model.Invoice.date <= date_to).all()
+        if timesheets:
+            for timesheet in timesheets:
+                self.l.info("  Generating timesheet %s", timesheet.file_name)
+                # formatter.generate(invoice)
+        else:
+            self.l.critical("No timesheet found matching these criteria")
+
 
     def import_(self):
         sess = model.get_session(self.args['db'])

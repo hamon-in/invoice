@@ -91,6 +91,11 @@ class Timesheet(InvoiceBase, Base):
     data = Column(String(1000))
     client = relationship('Client')
     
+    @property
+    def file_name(self):
+        datestr = self.date.strftime("%Y%m%d")
+        return "{}-{}-{}".format(datestr, self.client.name, self.description.replace(" ", "-")[:10])
+
 
 class Invoice(InvoiceBase, Base):
     __tablename__ = "invoices"
