@@ -12,7 +12,10 @@ from . import __version__
 
 l = None
 
-def setup_logging(level = logging.DEBUG):
+def setup_logging(debug):
+    level = logging.INFO
+    if debug:
+        level = logging.DEBUG
     global l 
     l = logging.getLogger("invoice")
     l.setLevel(level)
@@ -29,6 +32,7 @@ def parse_args():
 
     parser = argparse.ArgumentParser(description = "Manage invoices")
     parser.add_argument("-f", "--file" , dest = "db", help = "Name of database file", default=argparse.SUPPRESS)
+    parser.add_argument("-d", "--debug", dest = "debug", action = "store_true", default = False, help = "Turn on debugging output")
     subparsers = parser.add_subparsers(title="Commands", dest="command", help = "Commands available")
     subparsers.required = True
 
@@ -227,9 +231,9 @@ def dispatch(args):
         sys.exit(-1)
 
 def main():
-    setup_logging()
-    l.debug("Invoice version '%s'", __version__)
     args = parse_args()
+    setup_logging(args.debug)
+    l.debug("Invoice version '%s'", __version__)
     dispatch(args)
 
 if __name__ == '__main__':
