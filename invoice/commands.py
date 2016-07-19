@@ -514,7 +514,21 @@ class TimesheetCommand(Command):
         super().__init__(args)
         self.sc_handlers = {'import'  : self.import_,
                             'generate' : self.generate,
-                            'edit' : self.edit}
+                            'edit' : self.edit,
+                            'rm' : self.rm}
+
+    def rm(self):
+        ts_id = self.args["id"]
+        sess = model.get_session(self.args['db'])
+
+        try:
+            timesheet = sess.query(model.Timesheet).filter(model.Timesheet.id == int(ts_id)).one()
+        except NoResultFound:
+            self.l.critical("No such timesheet '%s'", ts_id)
+            raise
+        sess.delete(timesheet)
+        sess.commit()
+
         
     def edit(self):
         ts_id = self.args["id"]

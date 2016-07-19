@@ -43,6 +43,9 @@ def parse_args():
                                                            metavar = "<Timesheet operation>",
                                                            help="Commands to manage timesheets")
     timesheet_subparsers.required = True
+    timesheet_rm_parser = timesheet_subparsers.add_parser("rm", help="Delete an existing timesheet")
+    timesheet_rm_parser.add_argument("-i", "--id", required = True, help = "Id of the timesheet to delete")
+
     timesheet_edit_parser = timesheet_subparsers.add_parser("edit", help="Edit an existing timesheet")
     timesheet_edit_parser.add_argument("-i", "--id", required = True, help = "Id of timesheet to edit")
     timesheet_edit_parser.add_argument("-d", "--date", help = "Change timesheet date (dd/mm/yyyy)")
