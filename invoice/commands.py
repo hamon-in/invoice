@@ -336,9 +336,21 @@ class InvoiceCommand(Command):
     
     def list(self):
         sess = model.get_session(self.args['db'])
-        for invoice in sess.query(model.Invoice).all():
-            tags = ", ".join (x.name for x in invoice.tags)
-            self.l.info("     %s | %s | %s | %s ", invoice.id, invoice.date.strftime("%d/%m/%Y") , invoice.particulars, tags)
+        tags = self.args['tag']
+        # tags = sess.query(model.InvoiceTag).filter(or_(*[model.InvoiceTag.name == x for x in tags])).all()
+        # print (tags)
+        
+        if tags:
+            invoices = sess.query(model.Invoice).filter(model.Invoice.tags.any(model.InvoiceTag.name.in_(tags))).all()
+        else:
+            invoices = sess.query(model.Invoice).all()
+
+        if invoices:
+            for invoice in invoices:
+                tags = ", ".join (x.name for x in invoice.tags)
+                self.l.info("     %s | %s | %s | %s ", invoice.id, invoice.date.strftime("%d/%m/%Y") , invoice.particulars, tags)
+        else:
+            self.l.info("No invoices matching criteria")
         
     def add(self):
         self.l.debug("Adding invoice")
@@ -369,7 +381,7 @@ class InvoiceCommand(Command):
 
 |{}|
 
-""".format(", ".join(fields), "|".join(["          "]*5))
+""".format(", ".join(fields), "|".join(["          "]*len(fields)))
 
         _, data = helpers.get_from_file(boilerplate)
         invoice = model.Invoice(date = date,
