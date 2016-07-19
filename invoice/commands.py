@@ -406,8 +406,9 @@ class InvoiceCommand(Command):
                                                                        model.Invoice.date <= date_to).all()
         if invoices:
             for invoice in invoices:
-                self.l.info("  Generating invoice %s", invoice.file_name)
-                formatter.generate_invoice(invoice)
+                fname = formatter.generate_invoice(invoice)
+                self.l.info("  Generated invoice %s", fname)
+
         else:
             self.l.critical("No invoices found matching these criteria")
 
@@ -627,8 +628,9 @@ class TimesheetCommand(Command):
                                   model.Timesheet.date <= date_to).all()
         if timesheets:
             for timesheet in timesheets:
-                self.l.info("  Generating timesheet %s", timesheet.file_name)
-                formatter.generate_timesheet(timesheet)
+                fname = formatter.generate_timesheet(timesheet)
+                self.l.info("  Generated timesheet %s", fname)
+
         else:
             self.l.critical("No timesheet found matching these criteria")
 

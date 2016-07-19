@@ -1,5 +1,7 @@
 from decimal import Decimal
 import io
+import itertools
+import os
 
 from PyPDF2 import PdfFileWriter, PdfFileReader
 from reportlab.pdfgen import canvas
@@ -179,15 +181,25 @@ class PDFFormatter(Formatter):
         doc.build(content)
         return packet
 
-        
+    def gen_unique_filename(self, name):
+        basename, extension = os.path.splitext(os.path.basename(name))
+        if not os.path.exists(name):
+            return name
+        else:
+            for i in itertools.count(1):
+                nname = "{}_({}){}".format(basename, i, extension)
+                if not os.path.exists(nname):
+                    return nname
 
     def generate_timesheet(self, timesheet):
         timesheet_layer = self.create_timesheet_layer(timesheet.serialise())
         final_timesheet = self.add_to_letterhead(timesheet_layer, timesheet.template.letterhead)
 
-        outputStream = open(timesheet.file_name+".pdf", "wb")
+        fname = self.gen_unique_filename(timesheet.file_name+".pdf")
+        outputStream = open(fname, "wb")
         final_timesheet.write(outputStream)
         outputStream.close()
+        return fname
         
 
 
@@ -195,7 +207,9 @@ class PDFFormatter(Formatter):
         invoice_layer = self.create_invoice_layer(invoice.serialise())
         final_invoice = self.add_to_letterhead(invoice_layer, invoice.template.letterhead)
 
-        outputStream = open(invoice.file_name+".pdf", "wb")
+        fname = self.gen_unique_filename(invoice.file_name+".pdf")
+        outputStream = open(fname, "wb")
         final_invoice.write(outputStream)
         outputStream.close()
+        return fname
 
