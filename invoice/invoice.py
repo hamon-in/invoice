@@ -33,6 +33,8 @@ def parse_args():
     parser = argparse.ArgumentParser(description = "Manage invoices")
     parser.add_argument("-f", "--file" , dest = "db", help = "Name of database file", default=argparse.SUPPRESS)
     parser.add_argument("-d", "--debug", dest = "debug", action = "store_true", default = False, help = "Turn on debugging output")
+    parser.add_argument("-o", "--output", dest = "output", default = argparse.SUPPRESS, help = "Turn on debugging output")
+
     subparsers = parser.add_subparsers(title="Commands", dest="command", help = "Commands available")
     subparsers.required = True
 

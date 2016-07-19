@@ -19,10 +19,11 @@ from . import __version__
 
 class Command:
     def __init__(self, args, db_init = True):
+        defaults = dict(output="generated")
         envars_config = {k.replace("INVOICE_", "").lower():v 
                          for k,v in os.environ.items() 
                          if k.startswith("INVOICE_")}
-        self.args = ChainMap(args.__dict__, envars_config)
+        self.args = ChainMap(args.__dict__, envars_config, defaults)
         self.l = logging.getLogger("invoice")
         self.formatters = formatters.get_formatters()
 
@@ -407,7 +408,7 @@ class InvoiceCommand(Command):
         date_start = datetime.datetime.strptime(self.args['from'], "%d/%m/%Y")
         date_to = datetime.datetime.strptime(self.args['to'], "%d/%m/%Y")
         fmt_name = self.args['format']
-        formatter = self.formatters[fmt_name]()
+        formatter = self.formatters[fmt_name](self.args['output'])
 
         self.l.info("Invoices between %s and %s", self.args['from'], self.args['to'])
         invoices = sess.query(model.Invoice).join(model.Client).filter(model.Client.name == self.args['client'],
@@ -620,7 +621,7 @@ class TimesheetCommand(Command):
         date_start = datetime.datetime.strptime(self.args['from'], "%d/%m/%Y")
         date_to = datetime.datetime.strptime(self.args['to'], "%d/%m/%Y")
         fmt_name = self.args['format']
-        formatter = self.formatters[fmt_name]()
+        formatter = self.formatters[fmt_name](self.args['output'])
         employee = self.args['employee']
         client = self.args['client']
 

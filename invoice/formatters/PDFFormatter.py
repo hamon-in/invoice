@@ -22,7 +22,7 @@ from .common import Formatter
 
 
 class PDFFormatter(Formatter):
-    def __init__(self):
+    def __init__(self, dir="generated"):
         self.styles = dict(name = ParagraphStyle("name", fontName = "Times-Roman", leading = 36,
                                                  fontSize = 30, alignment = TA_CENTER),
 
@@ -41,6 +41,10 @@ class PDFFormatter(Formatter):
                            regular = ParagraphStyle("to_address", fontName = "Times-Roman", leading = 12,
                                                     fontSize = 10, alignment = TA_RIGHT)
           )
+        if not os.path.exists(dir):
+            os.makedirs(dir)
+        self.base = dir
+            
         super().__init__()
 
     def create_invoice_layer(self, invoice_data):
@@ -182,12 +186,13 @@ class PDFFormatter(Formatter):
         return packet
 
     def gen_unique_filename(self, name):
+        full_name = os.path.join(self.base, name)
         basename, extension = os.path.splitext(os.path.basename(name))
-        if not os.path.exists(name):
-            return name
+        if not os.path.exists(full_name):
+            return full_name
         else:
             for i in itertools.count(1):
-                nname = "{}_({}){}".format(basename, i, extension)
+                nname = os.path.join(self.base, "{}_({}){}".format(basename, i, extension))
                 if not os.path.exists(nname):
                     return nname
 
