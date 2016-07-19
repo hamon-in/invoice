@@ -74,9 +74,25 @@ class SummaryCommand(Command):
     def __init__(self, args):
         super().__init__(args)
     
-    def __call__(self):
-        sess = model.get_session(self.args['db'])
+    def serialise_db(self, sess):
+        ret = {}
+        config = sess.query(model.Config).all()
+        ret['config'] = [{"name" : i.name, "value" : i.value, "system" : i.system} for i in config]
 
+        accounts = sess.query(model.Account).all()
+        ret['accounts'] = [dict(id = i.id,
+                                name = i.name,
+                                address = i.address,
+                                phone = i.phone,
+                                email = i.email,
+                                pan = i.pan,
+                                serv_tax_num = i.serv_tax_num,
+                                bank_details = i.bank_details,
+                                prefix = i.prefix) for i in accounts]
+
+        print (json.dumps(ret))
+
+    def human_summary(self, sess):
         self.l.info("Config:")
         for i in sess.query(model.Config).all():
             system = "*" if i.system else ''
@@ -100,6 +116,14 @@ class SummaryCommand(Command):
         for template in sess.query(model.InvoiceTemplate).all():
             self.l.info(" %s", template.name)        
         self.l.info("-"*20)
+
+
+    def __call__(self):
+        sess = model.get_session(self.args['db'])
+        if self.args['dump']:
+            self.serialise_db(sess)
+        else:
+            self.human_summary(sess)
 
             
             
