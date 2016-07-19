@@ -132,7 +132,16 @@ class TemplateCommand(Command):
         super().__init__(args)
         self.sc_handlers = {"add"  : self.add,
                             "edit" : self.edit,
-                            "rm"   : self.rm}
+                            "rm"   : self.rm,
+                            "ls"   : self.list_}
+
+    def list_(self):
+        sess = model.get_session(self.args['db'])
+        self.l.info("Templates :")
+        for template in sess.query(model.InvoiceTemplate).all():
+            self.l.info("%20s | %s ", template.name, template.description)
+
+            
 
 
     def add(self):
