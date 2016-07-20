@@ -29,7 +29,7 @@ class PDFFormatter(Formatter):
                            address = ParagraphStyle("address", fontName = "Times-Italic", leading = 9.6,
                                                     fontSize = 8, alignment = TA_CENTER),
 
-                           to_address = ParagraphStyle("to_address", fontName = "Times-Italic", leading = 12,
+                           to_address = ParagraphStyle("to_address", fontName = "Times-Roman", leading = 12,
                                                        fontSize = 10, alignment = TA_LEFT),
 
                            table_header = ParagraphStyle("table_header", fontName = "Times-Roman", leading = 12,
