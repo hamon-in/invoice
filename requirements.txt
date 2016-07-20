@@ -1,0 +1,5 @@
+PyPDF2==1.26.0
+PyYAML==3.11
+SQLAlchemy==1.0.13
+reportlab==3.3.0
+wheel==0.29.0
