@@ -60,7 +60,13 @@ def parse_args():
     timesheet_edit_parser.add_argument("-s", "--description", help="Change timesheet description")
     timesheet_edit_parser.add_argument("--edit", action="store_true", default = False, help="Edit timesheet data")
     
-    
+    timesheet_add_parser = timesheet_subparsers.add_parser("add", help="Manually add a timesheet")
+    timesheet_add_parser.add_argument("-d", "--date", default = datetime.date.today().strftime("%d/%m/%Y"), help = "Timesheet date (10/Aug/2010): Default is %(default)s")
+    timesheet_add_parser.add_argument("-e", "--employee", required = True, help="Employee name")
+    timesheet_add_parser.add_argument("-c", "--client", required = True, help="Client name")
+    timesheet_add_parser.add_argument("-s", "--description", required = True, help="Description of timesheet")
+    timesheet_add_parser.add_argument("-t", "--template", required = True, help="Template to use")
+
     timesheet_ls_parser = timesheet_subparsers.add_parser("ls", help="List timesheets")
     # TBD : Add criteria
 

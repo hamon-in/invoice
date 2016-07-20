@@ -537,6 +537,7 @@ class TimesheetCommand(Command):
         super().__init__(args)
         self.sc_handlers = {'import'  : self.import_,
                             'ls' : self.ls,
+                            'add' : self.add,
                             'generate' : self.generate,
                             'edit' : self.edit,
                             'rm' : self.rm}
@@ -656,6 +657,45 @@ class TimesheetCommand(Command):
 
         else:
             self.l.critical("No timesheet found matching these criteria")
+
+    def add(self):
+        sess = model.get_session(self.args['db'])
+        date = datetime.datetime.strptime(self.args['date'], "%d/%b/%Y")
+        employee = self.args['employee']
+        client = self.args['client']
+        template = self.args['template']
+        desc = self.args['description']
+
+        try:
+            client = sess.query(model.Client).filter(model.Client.name == client).one()
+        except NoResultFound:
+            self.l.critical("No such client '%s'", client)
+            raise
+
+        try:
+            template = sess.query(model.InvoiceTemplate).filter(model.InvoiceTemplate.name == template).one()
+        except NoResultFound:
+            self.l.critical("No such template '%s'", template)
+            raise
+
+        timesheet = model.Timesheet(date = date,
+                                    employee = employee,
+                                    template = template,
+                                    description = desc,
+                                    client = client)
+        
+        template = """# -*- text -*-
+# Local Variables: 
+# eval: (orgtbl-mode) 
+# End:
+#
+|   |   |
+"""
+        _, template = helpers.get_from_file(template)
+        timesheet.set_from_table(template)
+            
+        sess.add(timesheet)
+        sess.commit()
 
 
     def import_(self):
