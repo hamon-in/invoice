@@ -365,7 +365,7 @@ class InvoiceCommand(Command):
     def add(self):
         self.l.debug("Adding invoice")
         sess = model.get_session(self.args['db'])
-        date = datetime.datetime.strptime(self.args['date'], "%d/%m/%Y")
+        date = datetime.datetime.strptime(self.args['date'], "%d/%b/%Y")
         subject = self.args['particulars']
         try:
             template = sess.query(model.InvoiceTemplate).filter(model.InvoiceTemplate.name == self.args['template']).one()
@@ -405,8 +405,8 @@ class InvoiceCommand(Command):
         
     def generate(self):
         sess = model.get_session(self.args['db'])
-        date_start = datetime.datetime.strptime(self.args['from'], "%d/%m/%Y")
-        date_to = datetime.datetime.strptime(self.args['to'], "%d/%m/%Y")
+        date_start = datetime.datetime.strptime(self.args['from'], "%d/%b/%Y")
+        date_to = datetime.datetime.strptime(self.args['to'], "%d/%b/%Y")
         fmt_name = self.args['format']
         formatter = self.formatters[fmt_name](self.args['output'])
 
@@ -485,7 +485,7 @@ class InvoiceCommand(Command):
                 self.l.critical("No such template '%s'", template)
                 raise
         if date:
-            invoice.date = datetime.datetime.strptime(date, "%d/%m/%Y")
+            invoice.date = datetime.datetime.strptime(date, "%d/%b/%Y")
         if particulars:
             invoice.particulars = particulars
 
@@ -569,7 +569,7 @@ class TimesheetCommand(Command):
             raise
 
         if date:
-            timesheet.date = datetime.datetime.strptime(date, "%d/%m/%Y")
+            timesheet.date = datetime.datetime.strptime(date, "%d/%b/%Y")
         if employee:
             timesheet.employee = employee
         if desc:
@@ -618,8 +618,8 @@ class TimesheetCommand(Command):
 
     def generate(self):
         sess = model.get_session(self.args['db'])
-        date_start = datetime.datetime.strptime(self.args['from'], "%d/%m/%Y")
-        date_to = datetime.datetime.strptime(self.args['to'], "%d/%m/%Y")
+        date_start = datetime.datetime.strptime(self.args['from'], "%d/%b/%Y")
+        date_to = datetime.datetime.strptime(self.args['to'], "%d/%b/%Y")
         fmt_name = self.args['format']
         formatter = self.formatters[fmt_name](self.args['output'])
         employee = self.args['employee']
@@ -648,7 +648,7 @@ class TimesheetCommand(Command):
     def import_(self):
         sess = model.get_session(self.args['db'])
 
-        date = datetime.datetime.strptime(self.args['date'], "%d/%m/%Y")
+        date = datetime.datetime.strptime(self.args['date'], "%d/%b/%Y")
         description = self.args['description']
         employee = self.args['employee']
         template = self.args['template']

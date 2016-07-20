@@ -27,8 +27,8 @@ def setup_logging(debug):
 
 def parse_args():
     available_formats = formatters.get_formatters()
-    default_from = datetime.date.today().replace(day = 1).strftime("%d/%m/%Y")
-    default_to = datetime.date.today().strftime("%d/%m/%Y")
+    default_from = datetime.date.today().replace(day = 1).strftime("%d/%b/%Y")
+    default_to = datetime.date.today().strftime("%d/%b/%Y")
 
     parser = argparse.ArgumentParser(description = "Manage invoices")
     parser.add_argument("-f", "--file" , dest = "db", help = "Name of database file", default=argparse.SUPPRESS)
@@ -54,7 +54,7 @@ def parse_args():
 
     timesheet_edit_parser = timesheet_subparsers.add_parser("edit", help="Edit an existing timesheet")
     timesheet_edit_parser.add_argument("-i", "--id", required = True, help = "Id of timesheet to edit")
-    timesheet_edit_parser.add_argument("-d", "--date", help = "Change timesheet date (dd/mm/yyyy)")
+    timesheet_edit_parser.add_argument("-d", "--date", help = "Change timesheet date (e.g. 10/Aug/2010)")
     timesheet_edit_parser.add_argument("-e", "--employee", help = "Change employee name")
     timesheet_edit_parser.add_argument("-c", "--client", help="Change timesheet client")
     timesheet_edit_parser.add_argument("-s", "--description", help="Change timesheet description")
@@ -62,7 +62,7 @@ def parse_args():
     
     
     timesheet_import_parser = timesheet_subparsers.add_parser("import", help="Import a new timesheet")
-    timesheet_import_parser.add_argument("-d", "--date", default = datetime.date.today().strftime("%d/%m/%Y"), help = "Timesheet date (dd/mm/yyyy): Default is %(default)s")
+    timesheet_import_parser.add_argument("-d", "--date", default = datetime.date.today().strftime("%d/%m/%Y"), help = "Timesheet date (10/Aug/2010): Default is %(default)s")
     timesheet_import_parser.add_argument("-e", "--employee", required = True, help="Employee name")
     timesheet_import_parser.add_argument("-c", "--client", required = True, help="Client name")
     timesheet_import_parser.add_argument("-s", "--description", required = True, help="Description of timesheet")
@@ -72,10 +72,10 @@ def parse_args():
     timesheet_generate_parser = timesheet_subparsers.add_parser("generate", help = "Generate a timesheet")
     timesheet_generate_parser.add_argument("-f", "--from", 
                                            default = default_from,
-                                           help = "Generate all timesheets since this date (dd/mm/yyyy). Default is %(default)s")
+                                           help = "Generate all timesheets since this date (10/Aug/2010). Default is %(default)s")
     timesheet_generate_parser.add_argument("-t", "--to",
                                            default = default_to,
-                                           help = "Generate all timesheets till this date (dd/mm/yyyy). Default is %(default)s")
+                                           help = "Generate all timesheets till this date (10/Aug/2010). Default is %(default)s")
     timesheet_generate_parser.add_argument("--format", 
                                            default = list(available_formats)[0],
                                            choices = available_formats,
@@ -151,10 +151,10 @@ def parse_args():
     invoice_list_parser = invoice_subparsers.add_parser("list", help = "List invoices")
     invoice_list_parser.add_argument("-f", "--from", 
                                      default = default_from,
-                                     help = "Show only invoices since this date (dd/mm/yyyy). Default is %(default)s")
+                                     help = "Show only invoices since this date (10/Aug/2010). Default is %(default)s")
     invoice_list_parser.add_argument("-t", "--to",
                                      default = default_to,
-                                     help = "Show only invoices till this date (dd/mm/yyyy). Default is %(default)s")
+                                     help = "Show only invoices till this date (10/Aug/2010). Default is %(default)s")
     invoice_list_parser.add_argument("-c", "--client",
                                      help = "Show only invoices for this client")
     invoice_list_parser.add_argument("-g", "--tag",
@@ -166,7 +166,7 @@ def parse_args():
     invoice_add_parser = invoice_subparsers.add_parser("add", help = "Add a new invoice")
     invoice_add_parser.add_argument("-c", "--client", required = True, help = "Which client this invoice is for")
     invoice_add_parser.add_argument("-t", "--template", required = True, help = "Which template to use for this invoice")
-    invoice_add_parser.add_argument("-d", "--date", default = datetime.date.today().strftime("%d/%m/%Y"), help = "Invoice date (dd/mm/yyyy): Default is %(default)s")
+    invoice_add_parser.add_argument("-d", "--date", default = datetime.date.today().strftime("%d/%b/%Y"), help = "Invoice date (10/Aug/2010): Default is %(default)s")
     invoice_add_parser.add_argument("-p", "--particulars", required = True, 
                                     help = "Subject line for this invoice")
     invoice_generate_parser = invoice_subparsers.add_parser("generate", help = "Generate an invoice")
@@ -176,7 +176,7 @@ def parse_args():
     invoice_edit_parser.add_argument("-i", "--id", required = True, type = int, help = "Id of invoice to edit")
     invoice_edit_parser.add_argument("-c", "--client", help = "Change client for this invoice")
     invoice_edit_parser.add_argument("-t", "--template", help = "Change template for this invoice")
-    invoice_edit_parser.add_argument("-d", "--date", help = "Change invoice date (dd/mm/yyyy)")
+    invoice_edit_parser.add_argument("-d", "--date", help = "Change invoice date (10/Aug/2010)")
     invoice_edit_parser.add_argument("-p", "--particulars", help = "Subject line for this invoice")
     invoice_edit_parser.add_argument("-e", "--edit", action = "store_true", default = False, help = "Edit actual invoice content")
     tag_group = invoice_edit_parser.add_mutually_exclusive_group()
@@ -186,10 +186,10 @@ def parse_args():
 
     invoice_generate_parser.add_argument("-f", "--from", 
                                          default = default_from,
-                                         help = "Generate all invoices since this date (dd/mm/yyyy). Default is %(default)s")
+                                         help = "Generate all invoices since this date (10/Aug/2010). Default is %(default)s")
     invoice_generate_parser.add_argument("-t", "--to",
                                          default = default_to,
-                                         help = "Generate all invoices till this date (dd/mm/yyyy). Default is %(default)s")
+                                         help = "Generate all invoices till this date (10/Aug/2010). Default is %(default)s")
     invoice_generate_parser.add_argument("--format", 
                                          default = list(available_formats)[0],
                                          choices = available_formats,
