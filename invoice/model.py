@@ -103,16 +103,18 @@ class Timesheet(InvoiceBase, Base):
 
     def serialise(self):
         data = json.loads(self.data)
-        data = sorted(data.items(), key=lambda x: datetime.datetime.strptime(x[0], '%d/%m/%Y'))
+        data = sorted(data.items(), key=lambda x: datetime.datetime.strptime(x[0], '%d/%m/%Y %a'))
+        data = [[datetime.datetime.strptime(day, '%d/%m/%Y %a'), duration] for day,duration in data]
+        
         return dict(client = self.client.name,
                     data = data,
-                    date = self.date.strftime("%d %b %Y"),
+                    date = self.date.strftime("%d/%b/%Y"),
                     desc = self.description,
                     emp = self.employee)
 
     def to_table(self):
         data = json.loads(self.data)
-        data = sorted(data.items(), key=lambda x: datetime.datetime.strptime(x[0], '%d/%m/%Y'))
+        data = sorted(data.items(), key=lambda x: datetime.datetime.strptime(x[0], '%d/%m/%Y %a'))
         org_table = ["| {} | {} |".format(k,Decimal(v).quantize(Decimal('0.01'))) for k,v in data]
         return "\n".join(org_table)
         

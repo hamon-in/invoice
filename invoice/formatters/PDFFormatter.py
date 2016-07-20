@@ -155,7 +155,7 @@ class PDFFormatter(Formatter):
         content.append(Paragraph("<b>Description: </b>{}".format(description), self.styles['to_address']))
         content.append(Spacer(1, 0.25*inch))
 
-        columns = [[Paragraph("<b>%s</b>"%x, self.styles['table_header']) for x in ["Date","Hours"]]]
+        columns = [[Paragraph("<b>%s</b>"%x, self.styles['table_header']) for x in ["Day", "Date", "Hours"]]]
         list_style = TableStyle(
             [('LINEABOVE', (0,0), (-1,0), 1, colors.black),
              ('LINEBELOW', (0,0), (-1,0), 1, colors.black),
@@ -173,12 +173,14 @@ class PDFFormatter(Formatter):
         total = sum((Decimal(x[1]) for x in data), Decimal(0)).quantize(Decimal('0.01'))
         
         for date, hours in data:
-            columns.append([Paragraph(str(date), self.styles['table_small']),
+            columns.append([Paragraph(date.strftime('%a'), self.styles['table_small']),
+                            Paragraph(date.strftime('%d %b %Y'), self.styles['table_small']),
                             Paragraph(str(Decimal(hours).quantize(Decimal('0.01'))), self.styles['table_small'])])
-        columns.append([Paragraph("<b>Total hours</b>", self.styles['table_small']), 
+        columns.append(['',
+                        Paragraph("<b>Total hours</b>", self.styles['table_small']), 
                         Paragraph(str(total), self.styles['table_small'])])
 
-        content.append(Table(columns, colWidths=120, style = list_style, hAlign='LEFT'))
+        content.append(Table(columns, colWidths=[50, 150, 50], style = list_style, hAlign='LEFT'))
 
 
 

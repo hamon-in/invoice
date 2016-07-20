@@ -106,16 +106,16 @@ class SummaryCommand(Command):
                 self.l.info("  Client: %s", client.name)
                 self.l.info("    Invoices:")
                 for invoice in client.invoices:
-                    self.l.info("       %s | %s | %s", invoice.id, invoice.date.strftime("%d/%m/%Y") , invoice.particulars)
+                    self.l.info("       %s | %s | %s", invoice.id, invoice.date.strftime("%d %b %Y") , invoice.particulars)
                 self.l.info("    Timesheets:")
                 for timesheet in client.timesheets:
-                    self.l.info("       %s | %s | %s", timesheet.id, timesheet.date.strftime("%d/%m/%Y") , timesheet.description)
+                    self.l.info("       %s | %s | %s", timesheet.id, timesheet.date.strftime("%d %b %Y") , timesheet.description)
         self.l.info("-"*20)
 
 
         self.l.info("Invoice templates:")
         for template in sess.query(model.InvoiceTemplate).all():
-            self.l.info(" %s", template.name)        
+            self.l.info(" %20s | %s ", template.name, template.description)
         self.l.info("-"*20)
 
 
@@ -358,7 +358,7 @@ class InvoiceCommand(Command):
         if invoices:
             for invoice in invoices:
                 tags = ", ".join (x.name for x in invoice.tags)
-                self.l.info("     %s | %s | %s | %s ", invoice.id, invoice.date.strftime("%d/%m/%Y") , invoice.particulars, tags)
+                self.l.info("     %s | %s | %s | %s ", invoice.id, invoice.date.strftime("%d %b %Y") , invoice.particulars, tags)
         else:
             self.l.info("No invoices matching criteria")
         
@@ -605,7 +605,7 @@ class TimesheetCommand(Command):
             period_search = period_re.search(i)
             if day:
                 y, m, dom = day.groups()
-                cday = datetime.date(day=int(dom), month=int(m), year=int(y)).strftime('%d/%m/%Y')
+                cday = datetime.date(day=int(dom), month=int(m), year=int(y)).strftime('%d/%m/%Y %a')
             if period_search:
                 y0, m0, d0, hh0, mm0, y1, m1, d1, hh1, mm1 = period_search.groups()
                 t_start = datetime.datetime(year = int(y0), month = int(m0), day = int(d0), 
