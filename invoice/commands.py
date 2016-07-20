@@ -252,6 +252,11 @@ footer: |
         except NoResultFound:
             self.l.critical("No such template '%s'",self.args['name'])
             raise 
+        if 'letterhead' in self.args:
+            with open(self.args['letterhead'], "rb") as f:
+                letterhead = f.read()
+                template.letterhead = letterhead
+                self.l.debug("Updated letterhead")
         if 'desc' in self.args:
             template.description = self.args['desc']
             self.l.debug("Description of %s updated", self.args['name'])
