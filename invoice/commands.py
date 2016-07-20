@@ -19,12 +19,13 @@ from . import __version__
 
 class Command:
     def __init__(self, args, db_init = True):
-        defaults = dict(output="generated")
+        defaults = dict(output="generated", chronological=False)
         envars_config = {k.replace("INVOICE_", "").lower():v 
                          for k,v in os.environ.items() 
                          if k.startswith("INVOICE_")}
         self.args = ChainMap(args.__dict__, envars_config, defaults)
         self.l = logging.getLogger("invoice")
+        self.l.debug("Options : %s", self.args)
         self.formatters = formatters.get_formatters()
 
         # Check database version
@@ -94,6 +95,7 @@ class SummaryCommand(Command):
         print (json.dumps(ret))
 
     def human_summary(self, sess):
+        chronological = self.args['chronological']
         self.l.info("Config:")
         for i in sess.query(model.Config).all():
             system = "*" if i.system else ''
@@ -103,12 +105,17 @@ class SummaryCommand(Command):
         for account in sess.query(model.Account).all():
             self.l.info("Account: %s", account.name)
             for client in account.clients:
+                invoices = sess.query(model.Invoice).filter(model.Invoice.client == client)
+                timesheets = sess.query(model.Timesheet).filter(model.Timesheet.client == client)
+                if chronological:
+                    invoices = invoices.order_by(model.Invoice.date)
+                    timesheets = timesheets.order_by(model.Timesheet.date)
                 self.l.info("  Client: %s", client.name)
                 self.l.info("    Invoices:")
-                for invoice in client.invoices:
+                for invoice in invoices:
                     self.l.info("       %s | %s | %s", invoice.id, invoice.date.strftime("%d %b %Y") , invoice.particulars)
                 self.l.info("    Timesheets:")
-                for timesheet in client.timesheets:
+                for timesheet in timesheets:
                     self.l.info("       %s | %s | %s", timesheet.id, timesheet.date.strftime("%d %b %Y") , timesheet.description)
         self.l.info("-"*20)
 

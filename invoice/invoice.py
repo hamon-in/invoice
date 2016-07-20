@@ -41,6 +41,7 @@ def parse_args():
     init_parser = subparsers.add_parser("init", help="Initialise invoice database")
 
     summary_parser = subparsers.add_parser("summary", help="Print a summary of the database contents")
+    summary_parser.add_argument("-c", "--chronological", action="store_true", default=argparse.SUPPRESS, help="Order by date rather than id")
     summary_parser.add_argument("-d", "--dump", action = "store_true", default = False, help = "Dump the entire database in a format that can be imported") #TBD
 
 
