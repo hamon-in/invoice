@@ -536,9 +536,22 @@ class TimesheetCommand(Command):
     def __init__(self, args):
         super().__init__(args)
         self.sc_handlers = {'import'  : self.import_,
+                            'ls' : self.ls,
                             'generate' : self.generate,
                             'edit' : self.edit,
                             'rm' : self.rm}
+
+    def ls(self):
+        sess = model.get_session(self.args['db'])
+        timesheets = sess.query(model.Timesheet).all()
+        self.l.info("Timesheets:")
+        for timesheet in timesheets:
+            self.l.info("  %s | %s | %10s | %s | %s ", 
+                        timesheet.id, 
+                        timesheet.client.name, 
+                        timesheet.employee, 
+                        timesheet.date.strftime("%d/%b/%Y"),
+                        timesheet.description)
 
     def rm(self):
         ts_id = self.args["id"]

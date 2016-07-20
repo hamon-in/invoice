@@ -61,6 +61,9 @@ def parse_args():
     timesheet_edit_parser.add_argument("--edit", action="store_true", default = False, help="Edit timesheet data")
     
     
+    timesheet_ls_parser = timesheet_subparsers.add_parser("ls", help="List timesheets")
+    # TBD : Add criteria
+
     timesheet_import_parser = timesheet_subparsers.add_parser("import", help="Import a new timesheet")
     timesheet_import_parser.add_argument("-d", "--date", default = datetime.date.today().strftime("%d/%m/%Y"), help = "Timesheet date (10/Aug/2010): Default is %(default)s")
     timesheet_import_parser.add_argument("-e", "--employee", required = True, help="Employee name")
