@@ -7,7 +7,8 @@ import tempfile
 
 def memoise(fn):
     fn.cache = {}
-    functools.wraps(fn)
+
+    @functools.wraps(fn)
     def memoised_fn(*largs, **kargs):
         key = tuple(largs) + tuple(sorted(kargs.items()))
         if key in fn.cache:
