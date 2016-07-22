@@ -73,7 +73,7 @@ def parse_args():
     # TBD : Add criteria
 
     timesheet_import_parser = timesheet_subparsers.add_parser("import", help="Import a new timesheet")
-    timesheet_import_parser.add_argument("-d", "--date", default = datetime.date.today().strftime("%d/%m/%Y"), help = "Timesheet date (10/Aug/2010): Default is %(default)s")
+    timesheet_import_parser.add_argument("-d", "--date", default = datetime.date.today().strftime("%d/%b/%Y"), help = "Timesheet date (10/Aug/2010): Default is %(default)s")
     timesheet_import_parser.add_argument("-e", "--employee", required = True, help="Employee name")
     timesheet_import_parser.add_argument("-c", "--client", required = True, help="Client name")
     timesheet_import_parser.add_argument("-s", "--description", required = True, help="Description of timesheet")
