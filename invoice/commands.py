@@ -691,24 +691,30 @@ class TimesheetCommand(Command):
 
     def generate(self):
         sess = model.get_session(self.args['db'])
+        id = model.get_session(self.args['id'])
         date_start = datetime.datetime.strptime(self.args['from'], "%d/%b/%Y")
         date_to = datetime.datetime.strptime(self.args['to'], "%d/%b/%Y")
         fmt_name = self.args['format']
         formatter = self.formatters[fmt_name](self.args['output'])
         employee = self.args['employee']
         client = self.args['client']
+        id = self.args['id']
 
-        self.l.info("Timesheets between %s and %s", self.args['from'], self.args['to'])
-        j = sess.query(model.Timesheet).join(model.Client)
-        if employee:
-            timesheets = j.filter(model.Client.name == client,
-                                  model.Timesheet.employee == employee,
-                                  date_start <= model.Timesheet.date,
-                                  model.Timesheet.date <= date_to).all()
+        if id != -1:
+            self.l.info("Generating timesheet with %s", id)
+            j = sess.query(model.Timesheet).filter(model.Timesheet.id == id)
         else:
-            timesheets = j.filter(model.Client.name == client,
-                                  date_start <= model.Timesheet.date,
-                                  model.Timesheet.date <= date_to).all()
+            self.l.info("Timesheets between %s and %s", self.args['from'], self.args['to'])
+            j = sess.query(model.Timesheet).join(model.Client).filter(date_start <= model.Timesheet.date,
+                                                                      model.Timesheet.date <= date_to)
+            if client:
+                self.l.info("Filtering by client %s", client)
+                j = j.filter(model.Client.name == client)
+            if employee:
+                self.l.info("Filtering by employee %s", employee)
+                j = j.filter(model.Timesheet.employee == employee)
+
+        timesheets = j.all()
         if timesheets:
             for timesheet in timesheets:
                 fname = formatter.generate_timesheet(timesheet)

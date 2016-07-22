@@ -81,6 +81,9 @@ def parse_args():
     timesheet_import_parser.add_argument("timesheet")
 
     timesheet_generate_parser = timesheet_subparsers.add_parser("generate", help = "Generate a timesheet")
+    timesheet_generate_parser.add_argument("-d", "--id",
+                                           default = -1,
+                                           help = "Generate timesheet with this id (Overrides other options)")
     timesheet_generate_parser.add_argument("-f", "--from", 
                                            default = default_from,
                                            help = "Generate all timesheets since this date (10/Aug/2010). Default is %(default)s")
@@ -94,7 +97,7 @@ def parse_args():
     timesheet_generate_parser.add_argument("-e", "--employee",
                                            help = "Generate timesheets only for this employee.")
     timesheet_generate_parser.add_argument("-c", "--client",
-                                           required = True,
+                                           default = '',
                                            help = "Which client to generate invoices for.")
 
 
