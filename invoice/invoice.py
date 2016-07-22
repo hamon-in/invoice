@@ -181,7 +181,6 @@ def parse_args():
     invoice_add_parser.add_argument("-d", "--date", default = datetime.date.today().strftime("%d/%b/%Y"), help = "Invoice date (10/Aug/2010): Default is %(default)s")
     invoice_add_parser.add_argument("-p", "--particulars", required = True, 
                                     help = "Subject line for this invoice")
-    invoice_generate_parser = invoice_subparsers.add_parser("generate", help = "Generate an invoice")
     invoice_delete_parser = invoice_subparsers.add_parser("rm", help = "Delete an invoice")
     invoice_delete_parser.add_argument("-i", "--id", required = True, type = int, help = "Id of invoice to delete")
     invoice_edit_parser = invoice_subparsers.add_parser("edit", help = "Edits an existing invoice")
@@ -195,7 +194,10 @@ def parse_args():
     tag_group.add_argument("-a", "--add-tags", action = "append", help = "Tags to add to the invoice. Can be specified multiple times.")
     tag_group.add_argument("-r", "--replace-tags", action = "append", help = "Tags attached to the invoice will be replaced by these. Can be specified multiple times.")
     
-
+    invoice_generate_parser = invoice_subparsers.add_parser("generate", help = "Generate an invoice")
+    invoice_generate_parser.add_argument("-i", "--id",
+                                         default=-1,
+                                         help = "Generate invoice with this id. (Overrides other filtering)")
     invoice_generate_parser.add_argument("-f", "--from", 
                                          default = default_from,
                                          help = "Generate all invoices since this date (10/Aug/2010). Default is %(default)s")
@@ -208,7 +210,7 @@ def parse_args():
                                          help = "Format to output invoice. Default is %(default)s")
     
     invoice_generate_parser.add_argument("-c", "--client",
-                                         required = True,
+                                         default = '',
                                          help = "Which client to generate invoices for.")
 
     tag_parser = subparsers.add_parser("tag", help = "Manage invoice tags")

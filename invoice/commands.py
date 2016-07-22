@@ -460,16 +460,24 @@ class InvoiceCommand(Command):
         date_to = datetime.datetime.strptime(self.args['to'], "%d/%b/%Y")
         fmt_name = self.args['format']
         formatter = self.formatters[fmt_name](self.args['output'])
-
-        self.l.info("Invoices between %s and %s", self.args['from'], self.args['to'])
-        invoices = sess.query(model.Invoice).join(model.Client).filter(model.Client.name == self.args['client'],
-                                                                       date_start <= model.Invoice.date,
-                                                                       model.Invoice.date <= date_to).all()
+        client = self.args['client']
+        id = self.args['id']
+        query = sess.query(model.Invoice).join(model.Client)
+        if id != -1:
+            self.l.info("Generating invoice with id %s", id)
+            invoices = query.filter(model.Invoice.id == id).all()
+        else:
+            self.l.info("Invoices between %s and %s", self.args['from'], self.args['to'])
+            invoices = query.filter(date_start <= model.Invoice.date,
+                                    model.Invoice.date <= date_to)
+            if client:
+                self.l.info("Limiting to client %s", client)
+                invoices = invoices.filter(model.Client.name == self.args['client'])
+            invoices = invoices.all()
         if invoices:
             for invoice in invoices:
                 fname = formatter.generate_invoice(invoice)
                 self.l.info("  Generated invoice %s", fname)
-
         else:
             self.l.critical("No invoices found matching these criteria")
 
