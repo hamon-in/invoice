@@ -127,7 +127,7 @@ def parse_args():
     account_add_parser.add_argument("--bank-details", required = True, help = "Bank details. Must include bank name, address, account number, account holders name, IFSC code and any other details.")
     account_add_parser.add_argument("--prefix", help = "Invoice number prefix")
 
-    account_add_parser = account_subparsers.add_parser("list", help = "List accounts")
+    account_add_parser = account_subparsers.add_parser("ls", help = "List accounts")
 
     client_parser = subparsers.add_parser("client", help = "Manage clients")
     client_subparsers = client_parser.add_subparsers(title = "Client commands", dest = "op",
@@ -138,7 +138,7 @@ def parse_args():
     client_add_parser.add_argument("-n", "--name", help = "Name of client", required = True)
     client_add_parser.add_argument("-a", "--account", help = "Name of account under which this client is to be registered", required = True)
     client_add_parser.add_argument("--address", help = "Client billing address", required = True)
-    client_add_parser = client_subparsers.add_parser("list", help = "List clients")
+    client_add_parser = client_subparsers.add_parser("ls", help = "List clients")
 
     template_parser = subparsers.add_parser("template", help = "Manage templates")
     template_subarsers = template_parser.add_subparsers(title = "Template commands", dest = "op",
@@ -163,7 +163,7 @@ def parse_args():
                                                       metavar = "<Invoice operation>",
                                                       help = "Commands to manipulate invoices")
     invoice_subparsers.required = True
-    invoice_list_parser = invoice_subparsers.add_parser("list", help = "List invoices")
+    invoice_list_parser = invoice_subparsers.add_parser("ls", help = "List invoices")
     invoice_list_parser.add_argument("-f", "--from", 
                                      default = default_from,
                                      help = "Show only invoices since this date (10/Aug/2010). Default is %(default)s")
@@ -229,7 +229,7 @@ def parse_args():
     tag_rm_parser.add_argument("-n", "--name",
                                 required = True,
                                 help = "Name of new tag to delete")
-    tag_list_parser = tag_subparsers.add_parser("list", help = "List all tags")
+    tag_list_parser = tag_subparsers.add_parser("ls", help = "List all tags")
 
     args = parser.parse_args()
     return args
