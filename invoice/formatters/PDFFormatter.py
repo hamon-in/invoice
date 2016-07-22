@@ -1,7 +1,5 @@
 from decimal import Decimal
 import io
-import itertools
-import os
 
 from PyPDF2 import PdfFileWriter, PdfFileReader
 from reportlab.pdfgen import canvas
@@ -41,11 +39,7 @@ class PDFFormatter(Formatter):
                            regular = ParagraphStyle("to_address", fontName = "Times-Roman", leading = 12,
                                                     fontSize = 10, alignment = TA_RIGHT)
           )
-        if not os.path.exists(dir):
-            os.makedirs(dir)
-        self.base = dir
-            
-        super().__init__()
+        super().__init__(dir)
 
     def create_invoice_layer(self, invoice_data):
         client_address = invoice_data['client_address'].encode('utf-8').decode('unicode_escape')
@@ -182,23 +176,10 @@ class PDFFormatter(Formatter):
 
         content.append(Table(columns, colWidths=[50, 150, 50], style = list_style, hAlign='LEFT'))
 
-
-
         doc.build(content)
         return packet
 
-    def gen_unique_filename(self, name):
-        full_name = os.path.join(self.base, name)
-        basename, extension = os.path.splitext(os.path.basename(name))
-        if not os.path.exists(full_name):
-            return full_name
-        else:
-            for i in itertools.count(1):
-                nname = os.path.join(self.base, "{}_({}){}".format(basename, i, extension))
-                if not os.path.exists(nname):
-                    return nname
-
-    def generate_timesheet(self, timesheet):
+    def generate_timesheet(self, timesheet, stdout = False):
         timesheet_layer = self.create_timesheet_layer(timesheet.serialise())
         final_timesheet = self.add_to_letterhead(timesheet_layer, timesheet.template.letterhead)
 
@@ -209,8 +190,7 @@ class PDFFormatter(Formatter):
         return fname
         
 
-
-    def generate_invoice(self, invoice):
+    def generate_invoice(self, invoice, stdout = False):
         invoice_layer = self.create_invoice_layer(invoice.serialise())
         final_invoice = self.add_to_letterhead(invoice_layer, invoice.template.letterhead)
 
