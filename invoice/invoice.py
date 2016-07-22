@@ -91,7 +91,7 @@ def parse_args():
                                            default = default_to,
                                            help = "Generate all timesheets till this date (10/Aug/2010). Default is %(default)s")
     timesheet_generate_parser.add_argument("--format", 
-                                           default = list(available_formats)[0],
+                                           default = argparse.SUPPRESS,
                                            choices = available_formats,
                                            help = "Format to output invoice. Default is %(default)s")
     timesheet_generate_parser.add_argument("-e", "--employee",
@@ -99,6 +99,10 @@ def parse_args():
     timesheet_generate_parser.add_argument("-c", "--client",
                                            default = '',
                                            help = "Which client to generate invoices for.")
+    timesheet_generate_parser.add_argument("-s", "--stdout",
+                                           action="store_true",
+                                           default = argparse.SUPPRESS,
+                                           help = "Output to the screen.")
 
 
 
@@ -208,13 +212,17 @@ def parse_args():
                                          default = default_to,
                                          help = "Generate all invoices till this date (10/Aug/2010). Default is %(default)s")
     invoice_generate_parser.add_argument("--format", 
-                                         default = list(available_formats)[0],
+                                         default = argparse.SUPPRESS,
                                          choices = available_formats,
                                          help = "Format to output invoice. Default is %(default)s")
-    
     invoice_generate_parser.add_argument("-c", "--client",
                                          default = '',
                                          help = "Which client to generate invoices for.")
+    invoice_generate_parser.add_argument("-s", "--stdout",
+                                         action="store_true",
+                                         default = argparse.SUPPRESS,
+                                         help = "Output to the screen.")
+
 
     tag_parser = subparsers.add_parser("tag", help = "Manage invoice tags")
     tag_subparsers = tag_parser.add_subparsers(title = "Tag commands", dest = "op",
@@ -247,6 +255,8 @@ def dispatch(args):
             sys.exit(-1)
         command_handler()
     except NoResultFound:
+        sys.exit(-1)
+    except IOError:
         sys.exit(-1)
 
 def main():
