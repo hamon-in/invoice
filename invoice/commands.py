@@ -101,7 +101,7 @@ class SummaryCommand(Command):
         for i in sess.query(model.Config).all():
             system = "*" if i.system else ''
             self.l.info("%s %10s:%10s", system, i.name, i.value)
-        self.l.info("-"*20)
+        self.l.info("-"*70)
         
         for account in sess.query(model.Account).all():
             self.l.info("Account: %s", account.name)
@@ -128,13 +128,13 @@ class SummaryCommand(Command):
                         self.l.info(timesheet.summary(10)+"\n")
                     else:
                         self.l.info("       %s | %s | %s", timesheet.id, timesheet.date.strftime("%d %b %Y") , timesheet.description)
-        self.l.info("-"*20)
+        self.l.info("-"*70)
 
 
         self.l.info("Invoice templates:")
         for template in sess.query(model.InvoiceTemplate).all():
             self.l.info(" %20s | %s ", template.name, template.description)
-        self.l.info("-"*20)
+        self.l.info("-"*70)
 
 
     def __call__(self):
