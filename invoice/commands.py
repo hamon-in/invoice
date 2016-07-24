@@ -277,6 +277,7 @@ class AccountCommand(Command):
     def edit(self):
         name = self.args["name"]
         address = self.args["address"]
+        signatory = self.args['signatory']
         phone = self.args["phone"]
         email = self.args["email"]
         pan = self.args["pan"]
@@ -290,7 +291,8 @@ class AccountCommand(Command):
         except NoResultFound:
             self.l.critical("No account with name %s", name)
             raise
-
+        if signatory:
+            account.signatory = signatory
         if address:
             account.address = address
         if phone:
@@ -311,6 +313,7 @@ class AccountCommand(Command):
 
     def add(self):
         account = model.Account(name = self.args['name'],
+                                signatory = self.args['signatory'],
                                 address = self.args['address'],
                                 phone = self.args['phone'],
                                 email = self.args['email'],

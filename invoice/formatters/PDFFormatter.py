@@ -50,6 +50,7 @@ class PDFFormatter(Formatter):
         data_columns = invoice_data['columns']
         footers = invoice_data['footers']
         taxes = invoice_data['taxes']
+        signatory = invoice_data['signatory']
 
         # create a new PDF with Reportlab
         packet = io.BytesIO()
@@ -114,6 +115,10 @@ class PDFFormatter(Formatter):
         for i in bank_details.split("\n"):
             content.append(Paragraph(i, self.styles['to_address']))
 
+        content.append(Spacer(1, 0.25*inch))
+        content.append(Paragraph("Sincerely,                                  ",self.styles['regular']))
+        content.append(Spacer(1, 0.5*inch))
+        content.append(Paragraph("{}                                  ".format(signatory),self.styles['regular']))
 
         doc.build(content)
         return packet
@@ -175,6 +180,7 @@ class PDFFormatter(Formatter):
                         Paragraph(str(total), self.styles['table_small'])])
 
         content.append(Table(columns, colWidths=[50, 150, 50], style = list_style, hAlign='LEFT'))
+
 
         doc.build(content)
         return packet

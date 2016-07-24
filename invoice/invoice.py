@@ -113,6 +113,7 @@ def parse_args():
     account_subparsers.required = True
     account_edit_parser = account_subparsers.add_parser("edit", help = "Edit an existing account")
     account_edit_parser.add_argument("-n", "--name", help = "Name of account", required = True)
+    account_edit_parser.add_argument("-s", "--signatory", help = "Name of signatory")
     account_edit_parser.add_argument("-a", "--address", help = "Billing address account")
     account_edit_parser.add_argument("-p", "--phone", help = "Phone number")
     account_edit_parser.add_argument("-e", "--email", help = "Email address")
@@ -123,6 +124,7 @@ def parse_args():
 
     account_add_parser = account_subparsers.add_parser("add", help = "Create a new account")
     account_add_parser.add_argument("-n", "--name", help = "Name of account", required = True)
+    account_add_parser.add_argument("-s", "--signatory", help = "Name of signatory", required = True)
     account_add_parser.add_argument("-a", "--address", help = "Billing address account", required = True)
     account_add_parser.add_argument("-p", "--phone", help = "Phone number", required = True)
     account_add_parser.add_argument("-e", "--email", help = "Email address", required = True)

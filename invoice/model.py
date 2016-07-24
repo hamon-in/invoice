@@ -30,6 +30,7 @@ class Account(InvoiceBase, Base):
     __tablename__ = "accounts"
     id = Column(Integer, primary_key = True)
     name = Column(String(50))
+    signatory = Column(String(50))
     address = Column(String(500))
     phone = Column(String(15))
     email = Column(String(30))
@@ -49,6 +50,7 @@ class Account(InvoiceBase, Base):
         ret.append(" "*indent + "Serv tax number : {}".format(self.serv_tax_num))
         ret.append(" "*indent + "Bank details    : {}".format(wrap(self.bank_details.replace(r"\n", "\n"), indent+extra_indent)))
         ret.append(" "*indent + "Prefix          : {}".format(self.prefix))
+        ret.append(" "*indent + "Signatory       : {}".format(self.signatory))
         return "\n".join(ret)
 
         
@@ -213,6 +215,7 @@ class Invoice(InvoiceBase, Base):
         date = self.date.strftime("%d %b %Y")
         invoice_number = self.number
         return dict(client_address = client_address,
+                    signatory = self.client.account.signatory,
                     date = date,
                     particulars = self.particulars,
                     number = invoice_number,
