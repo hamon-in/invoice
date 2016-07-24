@@ -217,6 +217,7 @@ class Invoice(InvoiceBase, Base):
         invoice_number = self.number
         return dict(client_address = client_address,
                     signatory = self.client.account.signatory,
+                    bill_unit = self.client.bill_unit,
                     date = date,
                     particulars = self.particulars,
                     number = invoice_number,

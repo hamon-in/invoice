@@ -51,6 +51,7 @@ class PDFFormatter(Formatter):
         footers = invoice_data['footers']
         taxes = invoice_data['taxes']
         signatory = invoice_data['signatory']
+        bill_unit = invoice_data['bill_unit']
 
         # create a new PDF with Reportlab
         packet = io.BytesIO()
@@ -89,6 +90,7 @@ class PDFFormatter(Formatter):
         for i in data_columns:
             if i[-1]:
                 total += Decimal(i[-1])
+                i[-1] = "{} {}".format(str(i[-1]), bill_unit)
             columns.append(Paragraph(str(t), self.styles['regular']) for t in i)
 
         extra_vals = dict(net_total = total)
@@ -100,6 +102,7 @@ class PDFFormatter(Formatter):
 
         for i in footers:
             c1 =[] 
+            i[-1] = "{} {}".format(str(i[-1]), bill_unit)
             for j in i:
                 j = j.format(**extra_vals)
                 if j.startswith("b:"):

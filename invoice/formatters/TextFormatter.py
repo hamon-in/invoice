@@ -21,6 +21,7 @@ class TextFormatter(Formatter):
         data_columns = invoice_data['columns']
         footers = invoice_data['footers']
         taxes = invoice_data['taxes']
+        bill_unit = invoice_data['bill_unit']
 
         content = ["="*80]
         content.append("Date: {}\n".format(date))
@@ -64,6 +65,7 @@ class TextFormatter(Formatter):
         for i in data_columns:
             if i[-1]:
                 total += Decimal(i[-1])
+                i[-1] = "{} {}".format(i[-1], bill_unit)
             content.append(data_fmt_string.format(*[str(t).strip() for t in i]))
         content.append(sep_fmt_string)
 
@@ -75,6 +77,7 @@ class TextFormatter(Formatter):
 
         for i in footers:
             c1 = []
+            i[-1] = "{} {}".format(i[-1], bill_unit)
             for j in i:
                 if j.startswith("b:"):
                     j = j.replace("b:", "")
