@@ -106,13 +106,7 @@ class SummaryCommand(Command):
         for account in sess.query(model.Account).all():
             self.l.info("Account: %s", account.name)
             if verbose:
-                self.l.info("  Address         : %s", account.address)
-                self.l.info("  Phone           : %s", account.phone)
-                self.l.info("  Email           : %s", account.email)
-                self.l.info("  PAN             : %s", account.pan)
-                self.l.info("  Serv tax number : %s", account.serv_tax_num)
-                self.l.info("  Bank details    : %s", account.bank_details.replace("\n",r"\n"))
-                self.l.info("  Prefix          : %s", account.prefix)
+                self.l.info(account.summary(2))
             for client in account.clients:
                 invoices = sess.query(model.Invoice).filter(model.Invoice.client == client)
                 timesheets = sess.query(model.Timesheet).filter(model.Timesheet.client == client)
@@ -121,39 +115,17 @@ class SummaryCommand(Command):
                     timesheets = timesheets.order_by(model.Timesheet.date)
                 self.l.info("    Client: %s", client.name)
                 if verbose:
-                    self.l.info("      Address: %s", client.address.replace("\n", r"\n"))
+                    self.l.info("      Address: %s\n", helpers.wrap(client.address, 15))
                 self.l.info("      Invoices:")
                 for invoice in invoices:
                     if verbose:
-                        self.l.info("""           Id         : %s 
-           Date       : %s 
-           Template   : %s (%s)
-           Particulars: %s
-           Tags       : %s
-                        
-""", 
-                                    invoice.id, 
-                                    invoice.date.strftime("%d %b %Y"), 
-                                    invoice.template.name,
-                                    invoice.template.description,
-                                    invoice.particulars,
-                                    ", ".join(x.name for x in invoice.tags))
+                        self.l.info(invoice.summary(10)+"\n")
                     else:
                         self.l.info("       %s | %s | %s", invoice.id, invoice.date.strftime("%d %b %Y") , invoice.particulars)
                 self.l.info("      Timesheets:")
                 for timesheet in timesheets:
                     if verbose:
-                        self.l.info("""           Id         : %s 
-           Date       : %s 
-           Template   : %s (%s)
-           Description: %s
-                        
-""", 
-                                    timesheet.id, 
-                                    timesheet.date.strftime("%d %b %Y"), 
-                                    timesheet.template.name,
-                                    timesheet.template.description,
-                                    timesheet.description)
+                        self.l.info(timesheet.summary(10)+"\n")
                     else:
                         self.l.info("       %s | %s | %s", timesheet.id, timesheet.date.strftime("%d %b %Y") , timesheet.description)
         self.l.info("-"*20)

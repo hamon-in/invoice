@@ -2,7 +2,12 @@ import functools
 import os
 import subprocess
 import tempfile
+import textwrap
 
+def wrap(ip, extra_indent):
+    return textwrap.fill(ip, subsequent_indent = " "*extra_indent)
+    
+    
 
 def memoise(fn):
     fn.cache = {}

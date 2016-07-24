@@ -8,7 +8,7 @@ from sqlalchemy.orm import sessionmaker, relationship
 
 import yaml
 
-from  .helpers import memoise
+from  .helpers import memoise, wrap
 
 Base = declarative_base()
 
@@ -39,6 +39,19 @@ class Account(InvoiceBase, Base):
     prefix = Column(String(10))
     clients = relationship('Client', backref="account")
 
+    def summary(self, indent = 0):
+        ret = []
+        extra_indent = 18 # The length of "Address         : "
+        ret.append(" "*indent + "Address         : {}".format(wrap(self.address.replace(r"\n", "\n"), indent+extra_indent)))
+        ret.append(" "*indent + "Phone           : {}".format(self.phone))
+        ret.append(" "*indent + "Email           : {}".format(self.email))
+        ret.append(" "*indent + "PAN             : {}".format(self.pan))
+        ret.append(" "*indent + "Serv tax number : {}".format(self.serv_tax_num))
+        ret.append(" "*indent + "Bank details    : {}".format(wrap(self.bank_details.replace(r"\n", "\n"), indent+extra_indent)))
+        ret.append(" "*indent + "Prefix          : {}".format(self.prefix))
+        return "\n".join(ret)
+
+        
 class Client(InvoiceBase, Base):
     __tablename__ = "clients"
     name = Column(String(50), primary_key = True)
@@ -96,6 +109,14 @@ class Timesheet(InvoiceBase, Base):
     data = Column(String(1000))
     client = relationship('Client')
     
+    def summary(self, indent):
+        ret = []
+        ret.append(" "*indent + "Id         : {}".format(self.id))
+        ret.append(" "*indent + "Date       : {}".format(self.date.strftime("%d %b %Y")))
+        ret.append(" "*indent + "Template   : {}".format(self.template.name, self.template.description))
+        ret.append(" "*indent + "Description: {}".format(self.description))
+        return "\n".join(ret)
+    
     @property
     def file_name(self):
         datestr = self.date.strftime("%Y%m%d")
@@ -143,6 +164,15 @@ class Invoice(InvoiceBase, Base):
     client_id = Column(String,  ForeignKey('clients.name'))
     content = Column(String)
     tags = relationship('InvoiceTag', secondary=association_table, back_populates="invoices")
+    
+    def summary(self, indent):
+        ret = []
+        ret.append(" "*indent + "Id          : {}".format(self.id))
+        ret.append(" "*indent + "Date        : {}".format(self.date.strftime("%d %b %Y")))
+        ret.append(" "*indent + "Template    : {} ({})".format(self.template.name, self.template.description))
+        ret.append(" "*indent + "Particulars : {}".format(self.particulars))
+        ret.append(" "*indent + "Tags        : {}".format(", ".join(x.name for x in self.tags)))
+        return "\n".join(ret)
 
     @property
     def file_name(self):
