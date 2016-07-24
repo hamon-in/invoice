@@ -145,7 +145,7 @@ def parse_args():
     client_add_parser.add_argument("-a", "--account", help = "Name of account under which this client is to be registered", required = True)
     client_add_parser.add_argument("-b", "--bunit", help = "Units to bill in (e.g. ₹)", required = True)
     client_add_parser.add_argument("--address", help = "Client billing address", required = True)
-    client_add_parser = client_subparsers.add_parser("ls", help = "List clients")
+    client_list_parser = client_subparsers.add_parser("ls", help = "List clients")
 
     template_parser = subparsers.add_parser("template", help = "Manage templates")
     template_subarsers = template_parser.add_subparsers(title = "Template commands", dest = "op",
