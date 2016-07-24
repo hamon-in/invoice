@@ -395,7 +395,7 @@ class ClientCommand(Command):
         sess = model.get_session(self.args['db'])
         self.l.info("Clients")
         for i in sess.query(model.Client).all():
-            self.l.info(" %5d | %s | %s ",i.id, i.name, i.account.name)
+            self.l.info(" %s | %s ", i.name, i.account.name)
 
 
 class InvoiceCommand(Command):
