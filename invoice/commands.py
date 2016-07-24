@@ -335,10 +335,45 @@ class AccountCommand(Command):
 class ClientCommand(Command):
     def __init__(self, args):
         super().__init__(args)
-        self.sc_handlers = {'add'  : self.add_client,
-                            'list' : self.list_clients}
+        self.sc_handlers = {'add'  : self.add,
+                            'list' : self.list,
+                            'edit' : self.edit,
+        }
 
-    def add_client(self):
+    def edit(self):
+        sess = model.get_session(self.args['db'])
+        account = self.args["account"]
+        client = self.args['name']
+        billing_unit = self.args["bunit"]
+        address = self.args["address"]
+
+        try:
+            client = sess.query(model.Client).filter(model.Client.name == client).one()
+        except NoResultFound:
+            self.l.critical("No such client '%s'", client)
+            raise
+
+        if account:
+            try:
+                account = sess.query(model.Account).filter(model.Account.name == account).one()
+                client.account = account
+            except NoResultFound:
+                self.l.critical("No such account '%s'", account)
+                raise
+        
+        if billing_unit:
+            client.bill_unit = billing_unit
+
+        if address:
+            client.address = address
+
+        sess.add(client)
+        sess.commit()
+
+        
+
+
+    def add(self):
         sess = model.get_session(self.args['db'])
         try:
             account = sess.query(model.Account).filter(model.Account.name == self.args['account']).one()
@@ -356,7 +391,7 @@ class ClientCommand(Command):
         sess.commit()
 
     
-    def list_clients(self):
+    def list(self):
         sess = model.get_session(self.args['db'])
         self.l.info("Clients")
         for i in sess.query(model.Client).all():
