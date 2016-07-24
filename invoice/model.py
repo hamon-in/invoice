@@ -205,9 +205,9 @@ class Invoice(InvoiceBase, Base):
         
     def serialise(self):
         """
-        Takes all the data necessary to generate this invoice and coverts
-        it into a nice dictionary that can be used by the formatter to 
-        create the final PDF/HTML invoice.
+        Takes all the data necessary to generate this invoice and converts
+        it into a nice dictionary that can be used by the formatter to create
+        the final PDF/HTML invoice.
         """
         client_address = self.client.address
         date = self.date.strftime("%d %b %Y")
