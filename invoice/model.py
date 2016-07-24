@@ -57,6 +57,7 @@ class Account(InvoiceBase, Base):
 class Client(InvoiceBase, Base):
     __tablename__ = "clients"
     name = Column(String(50), primary_key = True)
+    bill_unit = Column(String(10))
     address = Column(String(500))
     account_id = Column(Integer, ForeignKey('accounts.id'))
     invoices = relationship("Invoice", back_populates="client")

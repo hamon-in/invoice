@@ -115,7 +115,8 @@ class SummaryCommand(Command):
                     timesheets = timesheets.order_by(model.Timesheet.date)
                 self.l.info("    Client: %s", client.name)
                 if verbose:
-                    self.l.info("      Address: %s\n", helpers.wrap(client.address, 15))
+                    self.l.info("      Address  : %s", helpers.wrap(client.address, 17))
+                    self.l.info("      Billed in: %s\n", client.bill_unit)
                 self.l.info("      Invoices:")
                 for invoice in invoices:
                     if verbose:
@@ -347,6 +348,7 @@ class ClientCommand(Command):
 
         client = model.Client(name = self.args['name'],
                               address = self.args['address'],
+                              bill_unit = self.args['bunit'],
                               account = account)
 
 
