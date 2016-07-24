@@ -272,7 +272,7 @@ class AccountCommand(Command):
     def __init__(self, args):
         super().__init__(args)
         self.sc_handlers = {'add'  : self.add,
-                            'list' : self.list,
+                            'ls' : self.list,
                             'edit' : self.edit}
 
     def edit(self):
@@ -336,7 +336,7 @@ class ClientCommand(Command):
     def __init__(self, args):
         super().__init__(args)
         self.sc_handlers = {'add'  : self.add,
-                            'list' : self.list,
+                            'ls' : self.list,
                             'edit' : self.edit,
         }
 
@@ -405,7 +405,7 @@ class InvoiceCommand(Command):
                             'generate' : self.generate,
                             'edit' : self.edit,
                             "rm" : self.rm, 
-                            "list" : self.list}
+                            "ls" : self.list}
     
     def list(self):
         sess = model.get_session(self.args['db'])
@@ -578,7 +578,7 @@ class TagCommand(Command):
         super().__init__(args)
         self.sc_handlers = {'add'  : self.add,
                             'rm' : self.rm,
-                            "list" : self.list}
+                            "ls" : self.list}
                             # 'edit' : self.edit,
                             # "rm" : self.rm, 
                             # }
