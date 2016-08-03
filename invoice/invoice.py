@@ -52,10 +52,10 @@ def parse_args():
                                                            help="Commands to manage timesheets")
     timesheet_subparsers.required = True
     timesheet_rm_parser = timesheet_subparsers.add_parser("rm", help="Delete an existing timesheet")
-    timesheet_rm_parser.add_argument("-i", "--id", required = True, help = "Id of the timesheet to delete")
+    timesheet_rm_parser.add_argument("id", help = "Id of the timesheet to delete")
 
     timesheet_edit_parser = timesheet_subparsers.add_parser("edit", help="Edit an existing timesheet")
-    timesheet_edit_parser.add_argument("-i", "--id", required = True, help = "Id of timesheet to edit")
+    timesheet_edit_parser.add_argument("id", help = "Id of timesheet to edit")
     timesheet_edit_parser.add_argument("-d", "--date", help = "Change timesheet date (e.g. 10/Aug/2010)")
     timesheet_edit_parser.add_argument("-e", "--employee", help = "Change employee name")
     timesheet_edit_parser.add_argument("-c", "--client", help="Change timesheet client")
@@ -112,7 +112,7 @@ def parse_args():
                                                        help="Commands to manipulate accounts")
     account_subparsers.required = True
     account_edit_parser = account_subparsers.add_parser("edit", help = "Edit an existing account")
-    account_edit_parser.add_argument("-n", "--name", help = "Name of account", required = True)
+    account_edit_parser.add_argument("name", help = "Name of account")
     account_edit_parser.add_argument("-s", "--signatory", help = "Name of signatory")
     account_edit_parser.add_argument("-a", "--address", help = "Billing address account")
     account_edit_parser.add_argument("-p", "--phone", help = "Phone number")
@@ -147,7 +147,7 @@ def parse_args():
     client_add_parser.add_argument("--address", help = "Client billing address", required = True)
     client_list_parser = client_subparsers.add_parser("ls", help = "List clients")
     client_edit_parser = client_subparsers.add_parser("edit", help = "Edit client")
-    client_edit_parser.add_argument("-n", "--name", help = "Name of client to edit", required = True)
+    client_edit_parser.add_argument("name", help = "Name of client to edit")
     client_edit_parser.add_argument("-a", "--account", help = "Name of account under which this client is to be registered")
     client_edit_parser.add_argument("-b", "--bunit", help = "Billing unit for this client")
     client_edit_parser.add_argument("--address", help = "Client billing address")
@@ -162,11 +162,11 @@ def parse_args():
     template_add_parser.add_argument("-d", "--desc",  default = '', help = "Description of template")
     template_add_parser.add_argument("-l", "--letterhead",  default = '', help = "Add a letterhead to use as a base PDF")
     template_edit_parser = template_subarsers.add_parser("edit", help = "Edit a new template")
-    template_edit_parser.add_argument("-n", "--name",  required = True, help = "Name of invoice to edit")
+    template_edit_parser.add_argument("name", help = "Name of invoice to edit")
     template_edit_parser.add_argument("-d", "--desc",  default=argparse.SUPPRESS, help = "Change description to this")
     template_edit_parser.add_argument("-l", "--letterhead", default=argparse.SUPPRESS, help = "Change template letterhead to this file")
     template_del_parser = template_subarsers.add_parser("rm", help = "Delete template")
-    template_del_parser.add_argument("-n", "--name", required = True, help = "Name of invoice to delete")
+    template_del_parser.add_argument("name", help = "Name of invoice to delete")
     template_ls_parser = template_subarsers.add_parser("ls", help = "List templates")
 
 
@@ -197,9 +197,10 @@ def parse_args():
     invoice_add_parser.add_argument("-p", "--particulars", required = True, 
                                     help = "Subject line for this invoice")
     invoice_delete_parser = invoice_subparsers.add_parser("rm", help = "Delete an invoice")
-    invoice_delete_parser.add_argument("-i", "--id", required = True, type = int, help = "Id of invoice to delete")
+    invoice_delete_parser.add_argument("id", type = int, help = "Id of invoice to delete")
+
     invoice_edit_parser = invoice_subparsers.add_parser("edit", help = "Edits an existing invoice")
-    invoice_edit_parser.add_argument("-i", "--id", required = True, type = int, help = "Id of invoice to edit")
+    invoice_edit_parser.add_argument("id", type = int, help = "Id of invoice to edit")
     invoice_edit_parser.add_argument("-c", "--client", help = "Change client for this invoice")
     invoice_edit_parser.add_argument("-t", "--template", help = "Change template for this invoice")
     invoice_edit_parser.add_argument("-d", "--date", help = "Change invoice date (10/Aug/2010)")
@@ -238,13 +239,11 @@ def parse_args():
                                                 help = "Commands to manipulate invoice tags")
     tag_subparsers.required = True
     tag_add_parser = tag_subparsers.add_parser("add", help = "Create a new tag")
-    tag_add_parser.add_argument("-n", "--name",
-                                   required = True,
-                                   help = "Name of new tag to add")
+    tag_add_parser.add_argument("name", help = "Name of new tag to add")
+
     tag_rm_parser = tag_subparsers.add_parser("rm", help = "Delete an existing tag")
-    tag_rm_parser.add_argument("-n", "--name",
-                                required = True,
-                                help = "Name of new tag to delete")
+    tag_rm_parser.add_argument("name", help = "Name of new tag to delete")
+
     tag_list_parser = tag_subparsers.add_parser("ls", help = "List all tags")
 
     args = parser.parse_args()
