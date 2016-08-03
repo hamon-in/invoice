@@ -93,7 +93,7 @@ def parse_args():
     timesheet_generate_parser.add_argument("--format", 
                                            default = argparse.SUPPRESS,
                                            choices = available_formats,
-                                           help = "Format to output invoice. Default is %(default)s")
+                                           help = "Format to output invoice.")
     timesheet_generate_parser.add_argument("-e", "--employee",
                                            help = "Generate timesheets only for this employee.")
     timesheet_generate_parser.add_argument("-c", "--client",
