@@ -80,6 +80,9 @@ def parse_args():
     timesheet_import_parser.add_argument("-t", "--template", required = True, help="Template to use")
     timesheet_import_parser.add_argument("timesheet")
 
+    timesheet_parse_parser = timesheet_subparsers.add_parser("parse", help="Parse and print a timesheet")
+    timesheet_parse_parser.add_argument("timesheet", help = "Timesheet file")
+
     timesheet_generate_parser = timesheet_subparsers.add_parser("generate", help = "Generate a timesheet")
     timesheet_generate_parser.add_argument("-d", "--id",
                                            default = -1,

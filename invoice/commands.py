@@ -1,6 +1,6 @@
 import datetime
-from decimal import Decimal
 from collections import ChainMap, defaultdict
+from decimal import Decimal
 import json
 import logging
 import os
@@ -611,12 +611,28 @@ class TagCommand(Command):
 class TimesheetCommand(Command):
     def __init__(self, args):
         super().__init__(args)
-        self.sc_handlers = {'import'  : self.import_,
-                            'ls' : self.ls,
-                            'add' : self.add,
+        self.sc_handlers = {'import'   : self.import_,
+                            'ls'       : self.ls,
+                            'add'      : self.add,
                             'generate' : self.generate,
-                            'edit' : self.edit,
-                            'rm' : self.rm}
+                            'edit'     : self.edit,
+                            'rm'       : self.rm,
+                            'parse'    : self.parse}
+    
+    def parse(self):
+        with open(self.args['timesheet']) as f:
+            timesheet = json.loads(self.parse_timesheet(f))
+            self.l.info("\nParsed timesheet:")
+            data = sorted(timesheet.items(), key=lambda x: datetime.datetime.strptime(x[0], '%d/%m/%Y %a'))
+            total = Decimal(0.0)
+            for k,v in data:
+                value = Decimal(v)
+                total += value
+                self.l.info("%15s | %+6s ", k, value.quantize(Decimal('0.01')))
+
+            self.l.info("----------------+-------")
+            self.l.info("%15s | %+6s\n", "Total", total.quantize(Decimal('0.01')))
+        
 
     def ls(self):
         sess = model.get_session(self.args['db'])
