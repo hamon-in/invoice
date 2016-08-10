@@ -638,9 +638,12 @@ class TimesheetCommand(Command):
 
     def ls(self):
         sess = model.get_session(self.args['db'])
-        timesheets = sess.query(model.Timesheet).all()
+        timesheets = sess.query(model.Timesheet)
+        if self.args['chronological']:
+            timesheets = timesheets.order_by(model.Timesheet.date)
+        
         self.l.info("Timesheets:")
-        for timesheet in timesheets:
+        for timesheet in timesheets.all():
             self.l.info("  %s | %s | %10s | %s | %s ", 
                         timesheet.id, 
                         timesheet.client.name, 
