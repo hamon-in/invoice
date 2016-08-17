@@ -199,11 +199,11 @@ class PDFFormatter(Formatter):
         return fname
         
 
-    def generate_invoice(self, invoice, stdout = False):
+    def generate_invoice(self, invoice, stdout = False, overwrite = False):
         invoice_layer = self.create_invoice_layer(invoice.serialise())
         final_invoice = self.add_to_letterhead(invoice_layer, invoice.template.letterhead)
 
-        fname = self.gen_unique_filename(invoice.file_name+".pdf")
+        fname = self.gen_unique_filename(invoice.file_name+".pdf", overwrite)
         outputStream = open(fname, "wb")
         final_invoice.write(outputStream)
         outputStream.close()

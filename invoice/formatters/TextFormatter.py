@@ -133,7 +133,7 @@ class TextFormatter(Formatter):
         content.append("="*80)
         return "\n".join(content)
 
-    def generate_timesheet(self, timesheet, stdout = False):
+    def generate_timesheet(self, timesheet, stdout = False, overwrite = False):
         timesheet_data = self.create_timesheet_layer(timesheet.serialise())
         if stdout:
             print ("")
@@ -141,14 +141,14 @@ class TextFormatter(Formatter):
             print ("")
             fname = 'on stdout'
         else:
-            fname = self.gen_unique_filename(timesheet.file_name+".txt")
+            fname = self.gen_unique_filename(timesheet.file_name+".txt", overwrite)
             with open(fname, "w") as f:
                 f.write(timesheet_data)
         return fname
         
 
 
-    def generate_invoice(self, invoice, stdout=False):
+    def generate_invoice(self, invoice, stdout=False, overwrite = False):
         invoice_data = self.create_invoice_layer(invoice.serialise())
         if stdout:
             print ("")
@@ -156,7 +156,7 @@ class TextFormatter(Formatter):
             print ("")
             fname = 'on stdout'
         else:
-            fname = self.gen_unique_filename(invoice.file_name+".txt")
+            fname = self.gen_unique_filename(invoice.file_name+".txt", overwrite)
             with open(fname, "w") as f:
                 f.write(invoice_data)
         return fname

@@ -106,6 +106,11 @@ def parse_args():
                                            action="store_true",
                                            default = argparse.SUPPRESS,
                                            help = "Output to the screen.")
+    timesheet_generate_parser.add_argument("-w", "--overwrite",
+                                           action="store_true",
+                                           default = argparse.SUPPRESS,
+                                           help = "Overwrite existing generated files.")
+    
 
 
 
@@ -234,6 +239,11 @@ def parse_args():
                                          action="store_true",
                                          default = argparse.SUPPRESS,
                                          help = "Output to the screen.")
+    invoice_generate_parser.add_argument("-w", "--overwrite",
+                                         action="store_true",
+                                         default = argparse.SUPPRESS,
+                                         help = "Overwrite existing generated files.")
+
 
 
     tag_parser = subparsers.add_parser("tag", help = "Manage invoice tags")

@@ -19,10 +19,11 @@ from . import __version__
 
 class Command:
     def __init__(self, args, db_init = True):
-        defaults = dict(output="generated", chronological=False, stdout=False, format="txt")
+        defaults = dict(output="generated", chronological=False, stdout=False, format="txt", overwrite=False)
         envars_config = {k.replace("INVOICE_", "").lower():v 
                          for k,v in os.environ.items() 
                          if k.startswith("INVOICE_")}
+        
         self.args = ChainMap(args.__dict__, envars_config, defaults)
         self.l = logging.getLogger("invoice")
         self.l.debug("Options : %s", self.args)
@@ -473,6 +474,7 @@ class InvoiceCommand(Command):
         fmt_name = self.args['format']
         formatter = self.formatters[fmt_name](self.args['output'])
         client = self.args['client']
+        overwrite = self.args['overwrite']
         id = self.args['id']
         stdout = self.args['stdout']
         if stdout and not formatter.stdout_output:
@@ -489,11 +491,11 @@ class InvoiceCommand(Command):
                                     model.Invoice.date <= date_to)
             if client:
                 self.l.info("Limiting to client %s", client)
-                invoices = invoices.filter(model.Client.name == self.args['client'])
+                invoices = invoices.filter(model.Client.name == client)
             invoices = invoices.all()
         if invoices:
             for invoice in invoices:
-                fname = formatter.generate_invoice(invoice, self.args['stdout'])
+                fname = formatter.generate_invoice(invoice, stdout, overwrite)
                 self.l.info("  Generated invoice %s", fname)
         else:
             self.l.critical("No invoices found matching these criteria")
@@ -732,6 +734,7 @@ class TimesheetCommand(Command):
         employee = self.args['employee']
         client = self.args['client']
         stdout = self.args['stdout']
+        overwrite = self.args['overwrite']
         id = self.args['id']
         if stdout and not formatter.stdout_output:
             self.l.critical("Format %s doesn't allow stdout output", fmt_name)
@@ -754,7 +757,7 @@ class TimesheetCommand(Command):
         timesheets = j.all()
         if timesheets:
             for timesheet in timesheets:
-                fname = formatter.generate_timesheet(timesheet, self.args['stdout'])
+                fname = formatter.generate_timesheet(timesheet, self.args['stdout'], overwrite)
                 self.l.info("  Generated timesheet %s", fname)
 
         else:
