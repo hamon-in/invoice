@@ -51,6 +51,9 @@ def parse_args():
                                                            metavar = "<Timesheet operation>",
                                                            help="Commands to manage timesheets")
     timesheet_subparsers.required = True
+    timesheet_show_parser = timesheet_subparsers.add_parser("show", help = "Display a timesheet")
+    timesheet_show_parser.add_argument("id", help = "id of timesheet to show")
+
     timesheet_rm_parser = timesheet_subparsers.add_parser("rm", help="Delete an existing timesheet")
     timesheet_rm_parser.add_argument("id", help = "Id of the timesheet to delete")
 
@@ -179,6 +182,9 @@ def parse_args():
                                                       metavar = "<Invoice operation>",
                                                       help = "Commands to manipulate invoices")
     invoice_subparsers.required = True
+    invoice_show_parser = invoice_subparsers.add_parser("show", help = "Display an invoice")
+    invoice_show_parser.add_argument("id", help = "id of invoice to show")
+
     invoice_list_parser = invoice_subparsers.add_parser("ls", help = "List invoices")
     invoice_list_parser.add_argument("-f", "--from", 
                                      default = default_from,

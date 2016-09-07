@@ -405,9 +405,19 @@ class InvoiceCommand(Command):
         self.sc_handlers = {'add'  : self.add,
                             'generate' : self.generate,
                             'edit' : self.edit,
+                            'show' : self.show,
                             "rm" : self.rm, 
                             "ls" : self.list}
     
+    def show(self):
+        sess = model.get_session(self.args['db'])
+        inv_id = int(self.args['id'])
+        invoice = sess.query(model.Invoice).filter(model.Invoice.id == inv_id).one()
+        text_formatter = self.formatters['txt']()
+        generated_invoice = text_formatter.generate_invoice(invoice, True, False)
+        print("\n{}\n".format(generated_invoice))
+
+        
     def list(self):
         sess = model.get_session(self.args['db'])
         tags = self.args['tag']
@@ -613,9 +623,19 @@ class TimesheetCommand(Command):
                             'ls'       : self.ls,
                             'add'      : self.add,
                             'generate' : self.generate,
+                            'show'     : self.show,
                             'edit'     : self.edit,
                             'rm'       : self.rm,
                             'parse'    : self.parse}
+
+    def show(self):
+        sess = model.get_session(self.args['db'])
+        ts_id = int(self.args['id'])
+        timesheet = sess.query(model.Timesheet).filter(model.Timesheet.id == ts_id).one()
+        text_formatter = self.formatters['txt']()
+        generated_timesheet = text_formatter.generate_timesheet(timesheet, True, False)
+        print("\n{}\n".format(generated_timesheet))
+
     
     def parse(self):
         with open(self.args['timesheet']) as f:
