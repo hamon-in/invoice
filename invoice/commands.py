@@ -19,7 +19,7 @@ from . import __version__
 
 class Command:
     def __init__(self, args, db_init = True):
-        defaults = dict(output="generated", chronological=False, stdout=False, format="txt", overwrite=False)
+        defaults = dict(output="generated", chronological=False, format="txt", overwrite=False)
         envars_config = {k.replace("INVOICE_", "").lower():v 
                          for k,v in os.environ.items() 
                          if k.startswith("INVOICE_")}
@@ -476,10 +476,6 @@ class InvoiceCommand(Command):
         client = self.args['client']
         overwrite = self.args['overwrite']
         id = self.args['id']
-        stdout = self.args['stdout']
-        if stdout and not formatter.stdout_output:
-            self.l.critical("Format %s doesn't allow stdout output", fmt_name)
-            raise IOError()
 
         query = sess.query(model.Invoice).join(model.Client)
         if id != -1:
@@ -495,7 +491,7 @@ class InvoiceCommand(Command):
             invoices = invoices.all()
         if invoices:
             for invoice in invoices:
-                fname = formatter.generate_invoice(invoice, stdout, overwrite)
+                fname = formatter.generate_invoice(invoice, False, overwrite)
                 self.l.info("  Generated invoice %s", fname)
         else:
             self.l.critical("No invoices found matching these criteria")
@@ -736,12 +732,8 @@ class TimesheetCommand(Command):
         formatter = self.formatters[fmt_name](self.args['output'])
         employee = self.args['employee']
         client = self.args['client']
-        stdout = self.args['stdout']
         overwrite = self.args['overwrite']
         id = self.args['id']
-        if stdout and not formatter.stdout_output:
-            self.l.critical("Format %s doesn't allow stdout output", fmt_name)
-            raise IOError()
 
         if id != -1:
             self.l.info("Generating timesheet with %s", id)
@@ -760,7 +752,7 @@ class TimesheetCommand(Command):
         timesheets = j.all()
         if timesheets:
             for timesheet in timesheets:
-                fname = formatter.generate_timesheet(timesheet, self.args['stdout'], overwrite)
+                fname = formatter.generate_timesheet(timesheet, False, overwrite)
                 self.l.info("  Generated timesheet %s", fname)
 
         else:

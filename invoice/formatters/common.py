@@ -2,7 +2,6 @@ import itertools
 import os
 
 class Formatter:
-    stdout_output = False
     def __init__(self, dir="generated"):
         if not os.path.exists(dir):
             os.makedirs(dir)

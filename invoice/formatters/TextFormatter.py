@@ -7,8 +7,6 @@ from .common import Formatter
 
 
 class TextFormatter(Formatter):
-    stdout_output = True
-
     def __init__(self, dir="generated"):
         super().__init__(dir)
 
@@ -136,10 +134,7 @@ class TextFormatter(Formatter):
     def generate_timesheet(self, timesheet, stdout = False, overwrite = False):
         timesheet_data = self.create_timesheet_layer(timesheet.serialise())
         if stdout:
-            print ("")
-            print (timesheet_data)
-            print ("")
-            fname = 'on stdout'
+            fname = timesheet_data
         else:
             fname = self.gen_unique_filename(timesheet.file_name+".txt", overwrite)
             with open(fname, "w") as f:
@@ -151,10 +146,7 @@ class TextFormatter(Formatter):
     def generate_invoice(self, invoice, stdout=False, overwrite = False):
         invoice_data = self.create_invoice_layer(invoice.serialise())
         if stdout:
-            print ("")
-            print (invoice_data)
-            print ("")
-            fname = 'on stdout'
+            fname = invoice_data
         else:
             fname = self.gen_unique_filename(invoice.file_name+".txt", overwrite)
             with open(fname, "w") as f:

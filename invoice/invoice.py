@@ -102,10 +102,6 @@ def parse_args():
     timesheet_generate_parser.add_argument("-c", "--client",
                                            default = '',
                                            help = "Which client to generate invoices for.")
-    timesheet_generate_parser.add_argument("-s", "--stdout",
-                                           action="store_true",
-                                           default = argparse.SUPPRESS,
-                                           help = "Output to the screen.")
     timesheet_generate_parser.add_argument("-w", "--overwrite",
                                            action="store_true",
                                            default = argparse.SUPPRESS,
@@ -235,10 +231,6 @@ def parse_args():
     invoice_generate_parser.add_argument("-c", "--client",
                                          default = '',
                                          help = "Which client to generate invoices for.")
-    invoice_generate_parser.add_argument("-s", "--stdout",
-                                         action="store_true",
-                                         default = argparse.SUPPRESS,
-                                         help = "Output to the screen.")
     invoice_generate_parser.add_argument("-w", "--overwrite",
                                          action="store_true",
                                          default = argparse.SUPPRESS,
