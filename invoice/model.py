@@ -122,7 +122,7 @@ class Timesheet(InvoiceBase, Base):
     
     @property
     def file_name(self):
-        datestr = self.date.strftime("%Y%m%d")
+        datestr = self.date.strftime("%d-%b-%Y")
         return "Timesheet-{}-{}-{}".format(datestr, self.client.name, self.employee)
 
     def serialise(self):
@@ -179,7 +179,7 @@ class Invoice(InvoiceBase, Base):
 
     @property
     def file_name(self):
-        datestr = self.date.strftime("%Y%m%d")
+        datestr = self.date.strftime("%d-%b-%Y")
         return "Invoice-{}-{}-{}".format(datestr, self.client.name, self.particulars.replace(" ", "-")[:10])
 
     @property
