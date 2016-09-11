@@ -205,7 +205,7 @@ footer: |
         else:
             self.l.critical("Error in template format. Aborting")
             raise ValueError("Bad format in invoice template. Can't proceed.")
-        letterhead = ''
+        letterhead = b''
         if self.args['letterhead']:
             self.l.debug("Adding letterhead")
             with open(self.args['letterhead'], "rb") as f:
