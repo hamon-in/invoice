@@ -188,11 +188,11 @@ class PDFFormatter(Formatter):
         doc.build(content)
         return packet
 
-    def generate_timesheet(self, timesheet, stdout = False):
+    def generate_timesheet(self, timesheet, stdout = False, overwrite = False):
         timesheet_layer = self.create_timesheet_layer(timesheet.serialise())
         final_timesheet = self.add_to_letterhead(timesheet_layer, timesheet.template.letterhead)
 
-        fname = self.gen_unique_filename(timesheet.file_name+".pdf")
+        fname = self.gen_unique_filename(timesheet.file_name+".pdf", overwrite)
         outputStream = open(fname, "wb")
         final_timesheet.write(outputStream)
         outputStream.close()
