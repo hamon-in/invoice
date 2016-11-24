@@ -27,7 +27,7 @@ def setup_logging(debug):
 
 def parse_args():
     available_formats = formatters.get_formatters()
-    default_from = datetime.date.today().replace(day = 1).strftime("%d/%b/%Y")
+    default_from = (datetime.date.today() - datetime.timedelta(days=2)).strftime("%d/%b/%Y")
     default_to = datetime.date.today().strftime("%d/%b/%Y")
 
     parser = argparse.ArgumentParser(description = "Manage invoices")
