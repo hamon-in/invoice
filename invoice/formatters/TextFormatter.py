@@ -123,6 +123,7 @@ class TextFormatter(Formatter):
         content.append(sep_fmt_string)
 
         content.append(fmt_string.format(*['', "Total hours", str(total)]))
+        content.append(fmt_string.format(*['', "Number days", len(data)]))
 
         # content.append(Table(columns, colWidths=[50, 150, 50], style = list_style, hAlign='LEFT'))
         # doc.build(content)
