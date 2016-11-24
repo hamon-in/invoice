@@ -660,7 +660,7 @@ class TimesheetCommand(Command):
         
         self.l.info("Timesheets:")
         for timesheet in timesheets.all():
-            self.l.info("  %s | %s | %10s | %s | %s ", 
+            self.l.info("  %4s | %8s | %10s | %s | %s ", 
                         timesheet.id, 
                         timesheet.client.name, 
                         timesheet.employee, 
