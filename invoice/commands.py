@@ -6,6 +6,7 @@ import logging
 import os
 import re
 
+import semver
 import yaml
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.exc import IntegrityError
@@ -37,7 +38,7 @@ class Command:
                 if db_version != __version__:
                     self.l.critical("Database version is %s. Software version is %s. Can't proceed.", db_version, __version__)
                     raise TypeError("Database version mismatch")
-                self.l.info("Database version is '%s'", db_version)
+                self.l.debug("Database version is '%s'", db_version)
             except NoResultFound:
                 self.l.critical("No version found in database. Cannot proceed.")
                 raise
@@ -53,6 +54,26 @@ class Command:
             self.l.error("No handler for command %s", self.args['op'])
             raise
         return sc_handler()
+
+class DBCommand(Command):
+    def __init__(self, args):
+        super().__init__(args)
+        self.sc_handlers = {"info"  : self.info,
+                            "update": self.upgrade}
+
+    def info(self):
+        sess = model.get_session(self.args['db'])
+        db_version = sess.query(model.Config).filter(model.Config.name == "version").one().value
+        self.l.info("Database version %s", db_version)
+        self.l.info("Software version %s", __version__)
+        if semver.compare(db_version, __version__) == -1:
+            self.l.info("Database older than software. Consider updating.")
+        elif semver.compare(db_version, __version__) == 1:
+            self.l.info("Database newer than software. Some operations will not be possible.")
+    
+    def update(self):
+        pass
+        
 
 
 class InitCommand(Command):
@@ -854,6 +875,7 @@ class TimesheetCommand(Command):
 
 def get_commands():
     return {"init"     : InitCommand,
+            "db"       : DBCommand,
             "account"  : AccountCommand,
             "client"   : ClientCommand,
             "template" : TemplateCommand,
