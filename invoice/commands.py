@@ -725,7 +725,7 @@ class TimesheetCommand(Command):
 
     def parse_timesheet(self, data):
         ret = defaultdict(int)
-        day_re = re.compile(r'\*\* \[(\d+)-(\d+)-(\d+) [a-zA-Z]+')
+        day_re = re.compile(r'\*\* [[<](\d+)-(\d+)-(\d+) [a-zA-Z]+')
         period_re = re.compile(r'.*CLOCK: \[(\d+)-(\d+)-(\d+) [a-zA-Z]+ (\d+):(\d+)\]--\[(\d+)-(\d+)-(\d+) [a-zA-Z]+ (\d+):(\d+)\] =>  \d+:\d+')
         for i in data:
             day = day_re.search(i)
