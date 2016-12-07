@@ -423,7 +423,6 @@ class InvoiceCommand(Command):
         tags = self.args['tag']
         # tags = sess.query(model.InvoiceTag).filter(or_(*[model.InvoiceTag.name == x for x in tags])).all()
         # print (tags)
-        
         if tags:
             invoices = sess.query(model.Invoice).filter(model.Invoice.tags.any(model.InvoiceTag.name.in_(tags))).all()
         else:
@@ -432,7 +431,7 @@ class InvoiceCommand(Command):
         if invoices:
             for invoice in invoices:
                 tags = ", ".join (x.name for x in invoice.tags)
-                self.l.info("     %s | %s | %s | %s ", invoice.id, invoice.date.strftime("%d %b %Y") , invoice.particulars, tags)
+                self.l.info("     %3s | %s | %5s | %30s | %s ", invoice.id, invoice.date.strftime("%d %b %Y"), invoice.client.name,  invoice.particulars[:30], tags)
         else:
             self.l.info("No invoices matching criteria")
         
