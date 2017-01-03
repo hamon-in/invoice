@@ -732,6 +732,7 @@ class TimesheetCommand(Command):
             if day:
                 y, m, dom = day.groups()
                 cday = datetime.date(day=int(dom), month=int(m), year=int(y)).strftime('%d/%m/%Y %a')
+                self.l.debug("Adding entries for %s", cday)
             if period_search:
                 y0, m0, d0, hh0, mm0, y1, m1, d1, hh1, mm1 = period_search.groups()
                 t_start = datetime.datetime(year = int(y0), month = int(m0), day = int(d0), 
@@ -739,6 +740,7 @@ class TimesheetCommand(Command):
                 t_end = datetime.datetime(year = int(y1), month = int(m1), day = int(d1), 
                                           hour = int(hh1), minute = int(mm1))
                 duration = (t_end - t_start).total_seconds() / (60 * 60)
+                self.l.debug("  %s to %s = %s", t_start, t_end, duration)
                 ret[cday] += duration
         return json.dumps(ret)
 
