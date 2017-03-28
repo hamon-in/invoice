@@ -3,3 +3,4 @@ PyYAML==3.11
 SQLAlchemy==1.0.13
 reportlab==3.3.0
 wheel==0.29.0
+semver==2.7.6
