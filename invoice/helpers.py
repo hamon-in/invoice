@@ -1,8 +1,13 @@
 import functools
 import os
+import pkg_resources
 import subprocess
 import tempfile
 import textwrap
+
+
+def get_package_file(fname):
+    return  pkg_resources.resource_filename("invoice", fname)
 
 def wrap(ip, extra_indent):
     return textwrap.fill(ip, subsequent_indent = " "*extra_indent)

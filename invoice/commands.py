@@ -6,6 +6,8 @@ import logging
 import os
 import re
 
+from alembic import command
+from alembic.config import Config
 import semver
 import yaml
 from sqlalchemy.orm.exc import NoResultFound
@@ -57,9 +59,9 @@ class Command:
 
 class DBCommand(Command):
     def __init__(self, args):
-        super().__init__(args)
+        super().__init__(args, db_init = False)
         self.sc_handlers = {"info"  : self.info,
-                            "update": self.upgrade}
+                            "update": self.update}
 
     def info(self):
         sess = model.get_session(self.args['db'])
@@ -72,8 +74,25 @@ class DBCommand(Command):
             self.l.info("Database newer than software. Some operations will not be possible.")
     
     def update(self):
-        pass
+        sess = model.get_session(self.args['db'])
+        db_version = sess.query(model.Config).filter(model.Config.name == "version").one().value
+        sw_version = __version__
+        config_file = helpers.get_package_file("alembic.ini")
+        alembic_cfg = Config(config_file)
         
+        self.l.debug("Software version %s", __version__)
+        self.l.debug("Database version %s", db_version)
+        if semver.compare(db_version, __version__) == -1:
+            command.upgrade(alembic_cfg, "head")
+            version = sess.query(model.Config).filter(model.Config.name == "version").one()
+            version.value = __version__
+            sess.add(version)
+            sess.commit()
+            self.l.info("Database older than software. Updated to %s", __version__)
+        elif semver.compare(db_version, __version__) == 1:
+            self.l.info("Database newer than software. Please upgrade the application.")
+        else:
+            self.l.info("No updates necessary.")
 
 
 class InitCommand(Command):
