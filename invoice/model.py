@@ -180,7 +180,7 @@ class Invoice(InvoiceBase, Base):
     @property
     def file_name(self):
         datestr = self.date.strftime("%d-%b-%Y")
-        return "Invoice-{}-{}-{}".format(datestr, self.client.name, self.particulars.replace(" ", "-")[:10])
+        return "Invoice-{}-{}-{}".format(self.id, datestr, self.client.name)
 
     @property
     def number(self):
