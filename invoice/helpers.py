@@ -1,8 +1,21 @@
 import functools
 import os
+import pkg_resources
 import subprocess
 import tempfile
 import textwrap
+
+from alembic.config import Config
+
+def get_alembic_config(url):
+    alembic_cfg = Config()
+    alembic_cfg.set_main_option('sqlalchemy.url', "sqlite:///{}".format(url))
+    script_location = get_package_file('migrations')
+    alembic_cfg.set_main_option('script_location', script_location)
+    return alembic_cfg
+
+def get_package_file(fname):
+    return  pkg_resources.resource_filename("invoice", fname)
 
 def wrap(ip, extra_indent):
     return textwrap.fill(ip, subsequent_indent = " "*extra_indent)

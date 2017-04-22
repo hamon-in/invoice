@@ -6,16 +6,19 @@ import logging
 import os
 import re
 
+from alembic import command
+import semver
 import yaml
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import or_
 
+
+
 from . import model
 from . import helpers
 from . import formatters
 from . import __version__
-
 
 class Command:
     def __init__(self, args, db_init = True):
@@ -37,7 +40,7 @@ class Command:
                 if db_version != __version__:
                     self.l.critical("Database version is %s. Software version is %s. Can't proceed.", db_version, __version__)
                     raise TypeError("Database version mismatch")
-                self.l.info("Database version is '%s'", db_version)
+                self.l.debug("Database version is '%s'", db_version)
             except NoResultFound:
                 self.l.critical("No version found in database. Cannot proceed.")
                 raise
@@ -54,6 +57,57 @@ class Command:
             raise
         return sc_handler()
 
+class DBCommand(Command):
+    def __init__(self, args):
+        super().__init__(args, db_init = False)
+        self.sc_handlers = {"info"   : self.info,
+                            "update" : self.update,
+                            'migrate': self.migrate}
+
+
+    def info(self):
+        sess = model.get_session(self.args['db'])
+        db_version = sess.query(model.Config).filter(model.Config.name == "version").one().value
+        self.l.info("Database version %s", db_version)
+        self.l.info("Software version %s", __version__)
+        if semver.compare(db_version, __version__) == -1:
+            self.l.info("Database older than software. Consider updating.")
+        elif semver.compare(db_version, __version__) == 1:
+            self.l.info("Database newer than software. Some operations will not be possible.")
+    
+    def update(self):
+        sess = model.get_session(self.args['db'])
+        db_version = sess.query(model.Config).filter(model.Config.name == "version").one().value
+        sw_version = __version__
+        alembic_cfg = helpers.get_alembic_config(self.args['db'])
+        
+        self.l.debug("Software version %s", sw_version)
+        self.l.debug("Database version %s", db_version)
+        if semver.compare(db_version, sw_version) == -1:
+            command.upgrade(alembic_cfg, "head")
+            version = sess.query(model.Config).filter(model.Config.name == "version").one()
+            version.value = __version__
+            sess.add(version)
+            sess.commit()
+            self.l.info("Database older than software. Updated to %s", __version__)
+        elif semver.compare(db_version, __version__) == 1:
+            self.l.info("Database newer than software. Please upgrade the application.")
+        else:
+            self.l.info("No updates necessary.")
+
+    def migrate(self):
+        sess = model.get_session(self.args['db'])
+        db_version = sess.query(model.Config).filter(model.Config.name == "version").one().value
+        sw_version = __version__
+        alembic_cfg = helpers.get_alembic_config(self.args['db'])
+        
+        self.l.debug("Software version %s", sw_version)
+        self.l.debug("Database version %s", db_version)
+        if semver.compare(db_version, sw_version) == -1:
+            command.revision(alembic_cfg, "head", autogenerate=True, rev_id=sw_version)
+            self.l.info("New migration created from %s to %s", db_version, sw_version)
+        else:
+            self.l.info("Migrations not nececssary. Database is not older than software")
 
 class InitCommand(Command):
     def __init__(self, args):
@@ -732,6 +786,7 @@ class TimesheetCommand(Command):
             if day:
                 y, m, dom = day.groups()
                 cday = datetime.date(day=int(dom), month=int(m), year=int(y)).strftime('%d/%m/%Y %a')
+                self.l.debug("Adding entries for %s", cday)
             if period_search:
                 y0, m0, d0, hh0, mm0, y1, m1, d1, hh1, mm1 = period_search.groups()
                 t_start = datetime.datetime(year = int(y0), month = int(m0), day = int(d0), 
@@ -739,6 +794,7 @@ class TimesheetCommand(Command):
                 t_end = datetime.datetime(year = int(y1), month = int(m1), day = int(d1), 
                                           hour = int(hh1), minute = int(mm1))
                 duration = (t_end - t_start).total_seconds() / (60 * 60)
+                self.l.debug("  %s to %s = %s", t_start, t_end, duration)
                 ret[cday] += duration
         return json.dumps(ret)
 
@@ -852,6 +908,7 @@ class TimesheetCommand(Command):
 
 def get_commands():
     return {"init"     : InitCommand,
+            "db"       : DBCommand,
             "account"  : AccountCommand,
             "client"   : ClientCommand,
             "template" : TemplateCommand,

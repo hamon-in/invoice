@@ -27,7 +27,7 @@ def setup_logging(debug):
 
 def parse_args():
     available_formats = formatters.get_formatters()
-    default_from = datetime.date.today().replace(day = 1).strftime("%d/%b/%Y")
+    default_from = (datetime.date.today() - datetime.timedelta(days=2)).strftime("%d/%b/%Y")
     default_to = datetime.date.today().strftime("%d/%b/%Y")
 
     parser = argparse.ArgumentParser(description = "Manage invoices")
@@ -39,6 +39,16 @@ def parse_args():
     subparsers.required = True
 
     init_parser = subparsers.add_parser("init", help="Initialise invoice database")
+
+    db_parser = subparsers.add_parser("db", help="Manage invoice database")
+    db_parser.required = True
+    db_subparsers = db_parser.add_subparsers(title = "info", dest="op", 
+                             metavar="<Database operation>",
+                             help = "Manage invoice database")
+
+    db_info_parser = db_subparsers.add_parser("info", help="Summarise database status")
+    db_update_parser = db_subparsers.add_parser("update", help="Update the database to the latest version")
+    db_update_parser = db_subparsers.add_parser("migrate", help="Create database migrations (not needed for end users)")
 
     summary_parser = subparsers.add_parser("summary", help="Print a summary of the database contents")
     summary_parser.add_argument("-c", "--chronological", action="store_true", default=argparse.SUPPRESS, help="Order by date rather than id")
