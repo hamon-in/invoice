@@ -80,9 +80,9 @@ class DBCommand(Command):
         config_file = helpers.get_package_file("alembic.ini")
         alembic_cfg = Config(config_file)
         
-        self.l.debug("Software version %s", __version__)
+        self.l.debug("Software version %s", sw_version)
         self.l.debug("Database version %s", db_version)
-        if semver.compare(db_version, __version__) == -1:
+        if semver.compare(db_version, sw_version) == -1:
             command.upgrade(alembic_cfg, "head")
             version = sess.query(model.Config).filter(model.Config.name == "version").one()
             version.value = __version__
