@@ -10,6 +10,7 @@ import yaml
 
 from .helpers import memoise, wrap, get_alembic_config
 from alembic import command
+from .import __version__
 
 Base = declarative_base()
 
@@ -242,7 +243,7 @@ def create_database(db_file):
     engine = create_engine(url)
     Base.metadata.create_all(engine)
     alembic_cfg = get_alembic_config(db_file)
-    command.upgrade(alembic_cfg, 'head')
+    command.stamp(alembic_cfg, __version__)
     
 
     
