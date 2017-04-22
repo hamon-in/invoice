@@ -7,18 +7,18 @@ import os
 import re
 
 from alembic import command
-from alembic.config import Config
 import semver
 import yaml
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import or_
 
+
+
 from . import model
 from . import helpers
 from . import formatters
 from . import __version__
-
 
 class Command:
     def __init__(self, args, db_init = True):
@@ -79,8 +79,7 @@ class DBCommand(Command):
         sess = model.get_session(self.args['db'])
         db_version = sess.query(model.Config).filter(model.Config.name == "version").one().value
         sw_version = __version__
-        config_file = helpers.get_package_file("alembic.ini")
-        alembic_cfg = Config(config_file)
+        alembic_cfg = helpers.get_alembic_config(self.args['db'])
         
         self.l.debug("Software version %s", sw_version)
         self.l.debug("Database version %s", db_version)
