@@ -24,7 +24,6 @@ class Config(InvoiceBase, Base):
     name = Column(String(50), unique = True)
     value = Column(String(100))
     system = Column(Boolean())
-
     
 
 class Account(InvoiceBase, Base):
@@ -63,7 +62,7 @@ class Client(InvoiceBase, Base):
     account_id = Column(Integer, ForeignKey('accounts.id'))
     invoices = relationship("Invoice", back_populates="client")
     timesheets = relationship("Timesheet", back_populates="client")
-    
+    billing_dom = Column(Integer) # Day of month on which this client should be billed
 
 
 class InvoiceTemplate(InvoiceBase,  Base):

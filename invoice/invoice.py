@@ -162,12 +162,15 @@ def parse_args():
     client_add_parser.add_argument("-a", "--account", help = "Name of account under which this client is to be registered", required = True)
     client_add_parser.add_argument("-b", "--bunit", help = "Units to bill in (e.g. INR)", required = True)
     client_add_parser.add_argument("--address", help = "Client billing address", required = True)
+    client_add_parser.add_argument("-p", "--period", help = "Day of month on which this customer should be billed", required = True)
+
     client_list_parser = client_subparsers.add_parser("ls", help = "List clients")
     client_edit_parser = client_subparsers.add_parser("edit", help = "Edit client")
     client_edit_parser.add_argument("name", help = "Name of client to edit")
     client_edit_parser.add_argument("-a", "--account", help = "Name of account under which this client is to be registered")
     client_edit_parser.add_argument("-b", "--bunit", help = "Billing unit for this client")
     client_edit_parser.add_argument("--address", help = "Client billing address")
+    client_edit_parser.add_argument("-p", "--period", help = "Day of month on which this customer should be billed")
 
     template_parser = subparsers.add_parser("template", help = "Manage templates")
     template_subarsers = template_parser.add_subparsers(title = "Template commands", dest = "op",

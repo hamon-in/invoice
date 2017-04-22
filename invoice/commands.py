@@ -172,6 +172,7 @@ class SummaryCommand(Command):
                 if verbose:
                     self.l.info("      Address  : %s", helpers.wrap(client.address, 17))
                     self.l.info("      Billed in: %s\n", client.bill_unit)
+                    self.l.info("      Billed on %s of every month\n", client.billing_dom)
                 self.l.info("      Invoices:")
                 for invoice in invoices:
                     if verbose:
@@ -401,6 +402,7 @@ class ClientCommand(Command):
         client = self.args['name']
         billing_unit = self.args["bunit"]
         address = self.args["address"]
+        billing_dom = self.args["period"]
 
         try:
             client = sess.query(model.Client).filter(model.Client.name == client).one()
@@ -421,6 +423,9 @@ class ClientCommand(Command):
 
         if address:
             client.address = address
+            
+        if billing_dom:
+            client.billing_dom = billing_dom
 
         sess.add(client)
         sess.commit()
@@ -439,6 +444,7 @@ class ClientCommand(Command):
         client = model.Client(name = self.args['name'],
                               address = self.args['address'],
                               bill_unit = self.args['bunit'],
+                              billing_dom = self.args['period'],
                               account = account)
 
 
