@@ -8,7 +8,8 @@ from sqlalchemy.orm import sessionmaker, relationship
 
 import yaml
 
-from  .helpers import memoise, wrap
+from .helpers import memoise, wrap, get_alembic_config
+from alembic import command
 
 Base = declarative_base()
 
@@ -241,6 +242,8 @@ def create_database(db_file):
     url = "sqlite:///{}".format(db_file)
     engine = create_engine(url)
     Base.metadata.create_all(engine)
+    alembic_cfg = get_alembic_config(db_file)
+    command.upgrade(alembic_cfg, 'head')
     
 
     

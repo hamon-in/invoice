@@ -48,6 +48,7 @@ def parse_args():
 
     db_info_parser = db_subparsers.add_parser("info", help="Summarise database status")
     db_update_parser = db_subparsers.add_parser("update", help="Update the database to the latest version")
+    db_update_parser = db_subparsers.add_parser("migrate", help="Create database migrations (not needed for end users)")
 
     summary_parser = subparsers.add_parser("summary", help="Print a summary of the database contents")
     summary_parser.add_argument("-c", "--chronological", action="store_true", default=argparse.SUPPRESS, help="Order by date rather than id")

@@ -60,8 +60,10 @@ class Command:
 class DBCommand(Command):
     def __init__(self, args):
         super().__init__(args, db_init = False)
-        self.sc_handlers = {"info"  : self.info,
-                            "update": self.update}
+        self.sc_handlers = {"info"   : self.info,
+                            "update" : self.update,
+                            'migrate': self.migrate}
+
 
     def info(self):
         sess = model.get_session(self.args['db'])
@@ -94,6 +96,19 @@ class DBCommand(Command):
         else:
             self.l.info("No updates necessary.")
 
+    def migrate(self):
+        sess = model.get_session(self.args['db'])
+        db_version = sess.query(model.Config).filter(model.Config.name == "version").one().value
+        sw_version = __version__
+        alembic_cfg = helpers.get_alembic_config(self.args['db'])
+        
+        self.l.debug("Software version %s", sw_version)
+        self.l.debug("Database version %s", db_version)
+        if semver.compare(db_version, sw_version) == -1:
+            command.revision(alembic_cfg, "head", autogenerate=True, rev_id=sw_version)
+            self.l.info("New migration created from %s to %s", db_version, sw_version)
+        else:
+            self.l.info("Migrations not nececssary. Database is not older than software")
 
 class InitCommand(Command):
     def __init__(self, args):
