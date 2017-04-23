@@ -27,7 +27,7 @@ def setup_logging(debug):
 
 def parse_args():
     available_formats = formatters.get_formatters()
-    default_from = (datetime.date.today() - datetime.timedelta(days=2)).strftime("%d/%b/%Y")
+    default_from = (datetime.date.today() - datetime.timedelta(days=30)).strftime("%d/%b/%Y")
     default_to = datetime.date.today().strftime("%d/%b/%Y")
 
     parser = argparse.ArgumentParser(description = "Manage invoices")
@@ -201,7 +201,7 @@ def parse_args():
     invoice_list_parser = invoice_subparsers.add_parser("ls", help = "List invoices")
     invoice_list_parser.add_argument("-f", "--from", 
                                      default = default_from,
-                                     help = "Show only invoices since this date (10/Aug/2010). Default is %(default)s")
+                                     help = "Show only invoices since this date (10/Aug/2010). Use 'a' to list from beginning. Default is %(default)s")
     invoice_list_parser.add_argument("-t", "--to",
                                      default = default_to,
                                      help = "Show only invoices till this date (10/Aug/2010). Default is %(default)s")

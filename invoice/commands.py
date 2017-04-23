@@ -481,13 +481,19 @@ class InvoiceCommand(Command):
     def list(self):
         sess = model.get_session(self.args['db'])
         tags = self.args['tag']
-        # tags = sess.query(model.InvoiceTag).filter(or_(*[model.InvoiceTag.name == x for x in tags])).all()
-        # print (tags)
+        from_ = None if self.args['from'] == 'a' else datetime.datetime.strptime(self.args['from'], "%d/%b/%Y")
+        to = datetime.datetime.strptime(self.args['to'], "%d/%b/%Y")
         if tags:
-            invoices = sess.query(model.Invoice).filter(model.Invoice.tags.any(model.InvoiceTag.name.in_(tags))).all()
+            invoices = sess.query(model.Invoice).filter(model.Invoice.tags.any(model.InvoiceTag.name.in_(tags)))
         else:
-            invoices = sess.query(model.Invoice).all()
+            invoices = sess.query(model.Invoice)
 
+        if from_:
+            invoices = invoices.filter(from_ <= model.Invoice.date)
+
+        invoices = invoices.filter(model.Invoice.date <= to)
+            
+        invoices = invoices.all()
         if invoices:
             for invoice in invoices:
                 tags = ", ".join (x.name for x in invoice.tags)
