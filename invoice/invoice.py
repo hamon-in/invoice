@@ -210,6 +210,10 @@ def parse_args():
     invoice_list_parser.add_argument("-g", "--tag",
                                      action = "append",
                                      help = "Show only invoices with these tags. Can be given multiple times.")
+    invoice_list_parser.add_argument("-a", "--all",
+                                     action="store_true",
+                                     default=False,
+                                     help = "Show all invoices (including cancelled)")
     
     
 

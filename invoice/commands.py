@@ -483,6 +483,7 @@ class InvoiceCommand(Command):
         tags = self.args['tag']
         from_ = None if self.args['from'] == 'a' else datetime.datetime.strptime(self.args['from'], "%d/%b/%Y")
         to = datetime.datetime.strptime(self.args['to'], "%d/%b/%Y")
+        all_ = self.args['all']
         if tags:
             invoices = sess.query(model.Invoice).filter(model.Invoice.tags.any(model.InvoiceTag.name.in_(tags)))
         else:
@@ -492,6 +493,9 @@ class InvoiceCommand(Command):
             invoices = invoices.filter(from_ <= model.Invoice.date)
 
         invoices = invoices.filter(model.Invoice.date <= to)
+        
+        if not all_:
+            invoices = invoices.filter(model.Invoice.tags.any(model.InvoiceTag.name != 'cancelled'))
             
         invoices = invoices.all()
         if invoices:
