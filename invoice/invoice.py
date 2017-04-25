@@ -34,9 +34,9 @@ def parse_args():
     parser.add_argument("-f", "--file" , dest = "db", help = "Name of database file", default=argparse.SUPPRESS)
     parser.add_argument("-d", "--debug", dest = "debug", action = "store_true", default = False, help = "Turn on debugging output")
     parser.add_argument("-o", "--output", dest = "output", default = argparse.SUPPRESS, help = "Directory to output generated files")
+    parser.add_argument("-v", "--version", dest = "version", action = "store_true", default = False, help = "Display software and db version and quit.")
 
     subparsers = parser.add_subparsers(title="Commands", dest="command", help = "Commands available")
-    subparsers.required = True
 
     init_parser = subparsers.add_parser("init", help="Initialise invoice database")
 
@@ -275,12 +275,16 @@ def parse_args():
     tag_list_parser = tag_subparsers.add_parser("ls", help = "List all tags")
 
     args = parser.parse_args()
+    if not args.command and not args.version:
+        parser.error("Subcommand needed")
     return args
 
 
 def dispatch(args):
     cmd = args.command if hasattr(args, "command") else ""
     l.debug("Command is '%s'", cmd)
+    if args.version:
+        cmd = "version"
     try:
         dispatcher = commands.get_commands()
         command_class = dispatcher[cmd]

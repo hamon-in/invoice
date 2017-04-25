@@ -57,6 +57,21 @@ class Command:
             raise
         return sc_handler()
 
+class VersionCommand(Command):
+    """
+    This class is a special case since it doesn't run for normal sub
+    commands but for the --version flag. We should probably clean this
+    up but it works for now.
+    """
+    def __init__(self, args):
+        super().__init__(args, db_init = False)
+    
+    def __call__(self):
+        sess = model.get_session(self.args['db'])
+        db_version = sess.query(model.Config).filter(model.Config.name == "version").one().value
+        self.l.info("Invoice version  : %s", __version__)
+        self.l.info("Database version : %s", db_version)
+
 class DBCommand(Command):
     def __init__(self, args):
         super().__init__(args, db_init = False)
@@ -931,4 +946,5 @@ def get_commands():
             "summary"  : SummaryCommand,
             "invoice"  : InvoiceCommand,
             "tag"      : TagCommand,
-            "timesheet": TimesheetCommand}
+            "timesheet": TimesheetCommand,
+            "version"  : VersionCommand}
