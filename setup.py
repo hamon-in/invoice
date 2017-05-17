@@ -24,6 +24,8 @@ setup(
     license='MIT',
 
     packages=find_packages(),
+    
+    zip_safe = False,
 
     keywords = "finance invoice",
     url='https://github.com/hamon-in/invoice',
