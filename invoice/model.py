@@ -187,12 +187,16 @@ class Invoice(InvoiceBase, Base):
     def number(self):
         curr_year = int(self.date.strftime("%Y"))
         curr_month = int(self.date.strftime("%m"))
+        prefix = self.client.account.prefix
         if 1 <= curr_month <= 4: 
             next_year = curr_year
             curr_year -= 1
         else:
             next_year = curr_year + 1
-        return "{}/{}-{}".format(curr_year, next_year, self.id)
+        if prefix:
+            return "{}/{}-{}-{}".format(curr_year, next_year, prefix, self.id)
+        else:
+            return "{}/{}-{}".format(curr_year, next_year, self.id)
     
     @property
     def columns(self):
