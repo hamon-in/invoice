@@ -344,7 +344,18 @@ class AccountCommand(Command):
         super().__init__(args)
         self.sc_handlers = {'add'  : self.add,
                             'ls' : self.list,
-                            'edit' : self.edit}
+                            'edit' : self.edit,
+                            'show' : self.show}
+
+    def show(self):
+        sess = model.get_session(self.args['db'])
+        name = self.args['account']
+        try:
+            account = sess.query(model.Account).filter(model.Account.name == name).one()
+        except NoResultFound:
+            self.l.critical("No account with name %s", name)
+            raise
+        self.l.info(account.summary())
 
     def edit(self):
         name = self.args["name"]

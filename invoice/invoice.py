@@ -152,6 +152,9 @@ def parse_args():
 
     account_add_parser = account_subparsers.add_parser("ls", help = "List accounts")
 
+    account_show_parser = account_subparsers.add_parser("show", help = "Show account")
+    account_show_parser.add_argument("account", help = "Name of account")
+
     client_parser = subparsers.add_parser("client", help = "Manage clients")
     client_subparsers = client_parser.add_subparsers(title = "Client commands", dest = "op",
                                                      metavar = "<Client operation>",
