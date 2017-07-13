@@ -165,6 +165,10 @@ def parse_args():
     client_add_parser.add_argument("-p", "--period", help = "Day of month on which this customer should be billed", required = True)
 
     client_list_parser = client_subparsers.add_parser("ls", help = "List clients")
+
+    client_show_parser = client_subparsers.add_parser("show", help = "Show details of a client")
+    client_show_parser.add_argument("name", help = "Name of client to show")
+
     client_edit_parser = client_subparsers.add_parser("edit", help = "Edit client")
     client_edit_parser.add_argument("name", help = "Name of client to edit")
     client_edit_parser.add_argument("-a", "--account", help = "Name of account under which this client is to be registered")

@@ -409,8 +409,30 @@ class ClientCommand(Command):
         self.sc_handlers = {'add'  : self.add,
                             'ls' : self.list,
                             'edit' : self.edit,
+                            'show' : self.show
         }
 
+    def show(self):
+        sess = model.get_session(self.args['db'])
+        client = self.args['name']
+        try:
+            client = sess.query(model.Client).filter(model.Client.name == client).one()
+        except NoResultFound:
+            self.l.critical("No such client '%s'", client)
+            raise
+
+        self.l.info("Client      : %s (%s)", client.name, client.account.name)
+        self.l.info("Bill unit   : %s", client.bill_unit)
+        self.l.info("Billing dom : %s", client.billing_dom)
+        self.l.info("Address     :\n%s", client.address)
+
+        
+        self.l.info("-"*50)
+        self.l.info("Total income      : %s", "TBD")
+        self.l.info("Total debits      : %s", "TBD")
+        self.l.info("Total time billed : %s", "TBD")
+
+        
     def edit(self):
         sess = model.get_session(self.args['db'])
         account = self.args["account"]
