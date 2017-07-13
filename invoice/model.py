@@ -160,6 +160,7 @@ class Timesheet(InvoiceBase, Base):
 class Invoice(InvoiceBase, Base):
     __tablename__ = "invoices"
     id = Column(Integer,  primary_key = True)
+    disp_number = Column(Integer, unique=True)
     date = Column(Date)
     template_id = Column(String, ForeignKey('templates.name'))
     template = relationship('InvoiceTemplate')
@@ -194,9 +195,9 @@ class Invoice(InvoiceBase, Base):
         else:
             next_year = curr_year + 1
         if prefix:
-            return "{}/{}-{}-{}".format(curr_year, next_year, prefix, self.id)
+            return "{}/{}-{}-{}".format(curr_year, next_year, prefix, self.disp_number)
         else:
-            return "{}/{}-{}".format(curr_year, next_year, self.id)
+            return "{}/{}-{}".format(curr_year, next_year, self.disp_number)
     
     @property
     def columns(self):
