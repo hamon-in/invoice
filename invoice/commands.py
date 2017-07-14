@@ -554,7 +554,7 @@ class InvoiceCommand(Command):
         if invoices:
             for invoice in invoices:
                 tags = ", ".join (x.name for x in invoice.tags)
-                self.l.info("     %3s | %s | %5s | %30s | %s ", invoice.id, invoice.date.strftime("%d %b %Y"), invoice.client.name,  invoice.particulars[:30], tags)
+                self.l.info("     %3s | %15s | %s | %5s | %30s | %s ", invoice.id, invoice.number, invoice.date.strftime("%d %b %Y"), invoice.client.name,  invoice.particulars[:30], tags)
         else:
             self.l.info("No invoices matching criteria")
         
@@ -588,16 +588,18 @@ class InvoiceCommand(Command):
 |{}|
 
 """.format(", ".join(fields), "|".join(["          "]*len(fields)))
+        last_invoice_disp_number = sess.query(model.Invoice).order_by(model.Invoice.id)[-1].disp_number
 
         _, data = helpers.get_from_file(boilerplate)
         invoice = model.Invoice(date = date,
+                                disp_number = last_invoice_disp_number+1,
                                 particulars = subject,
                                 content = data,
                                 template = template,
                                 client = client)
         sess.add(invoice)
-
         sess.commit()
+        self.l.info("Added invoice with number %d(%s)", invoice.id, invoice.number)
         
     def generate(self):
         sess = model.get_session(self.args['db'])
