@@ -69,8 +69,8 @@ class VersionCommand(Command):
     def __call__(self):
         sess = model.get_session(self.args['db'])
         db_version = sess.query(model.Config).filter(model.Config.name == "version").one().value
-        self.l.info("Invoice version  : %s", __version__)
-        self.l.info("Database version : %s", db_version)
+        print("Invoice version  : {}".format(__version__))
+        print("Database version : {}".format(db_version))
 
 class DBCommand(Command):
     def __init__(self, args):
@@ -83,8 +83,8 @@ class DBCommand(Command):
     def info(self):
         sess = model.get_session(self.args['db'])
         db_version = sess.query(model.Config).filter(model.Config.name == "version").one().value
-        self.l.info("Database version %s", db_version)
-        self.l.info("Software version %s", __version__)
+        print("Database version %s".format(db_version))
+        print("Software version %s".format(__version__))
         if semver.compare(db_version, __version__) == -1:
             self.l.info("Database older than software. Consider updating.")
         elif semver.compare(db_version, __version__) == 1:
@@ -167,46 +167,46 @@ class SummaryCommand(Command):
     def human_summary(self, sess):
         chronological = self.args['chronological']
         verbose = self.args['verbose']
-        self.l.info("Config:")
+        print("Config:")
         for i in sess.query(model.Config).all():
             system = "*" if i.system else ''
-            self.l.info("%s %10s:%10s", system, i.name, i.value)
-        self.l.info("-"*70)
+            print("{} {:10}:{:10}".format(system, i.name, i.value))
+        print("-"*70)
         
         for account in sess.query(model.Account).all():
-            self.l.info("Account: %s", account.name)
+            print("Account: {}".format(account.name))
             if verbose:
-                self.l.info(account.summary(2))
+                print(account.summary(2))
             for client in account.clients:
                 invoices = sess.query(model.Invoice).filter(model.Invoice.client == client)
                 timesheets = sess.query(model.Timesheet).filter(model.Timesheet.client == client)
                 if chronological:
                     invoices = invoices.order_by(model.Invoice.date)
                     timesheets = timesheets.order_by(model.Timesheet.date)
-                self.l.info("    Client: %s", client.name)
+                print("    Client: {}".format(client.name))
                 if verbose:
-                    self.l.info("      Address  : %s", helpers.wrap(client.address, 17))
-                    self.l.info("      Billed in: %s\n", client.bill_unit)
-                    self.l.info("      Billed on %s of every month\n", client.billing_dom)
-                self.l.info("      Invoices:")
+                    print("      Address  : {}".format(helpers.wrap(client.address, 17)))
+                    print("      Billed in: {}\n".format(client.bill_unit))
+                    print("      Billed on {} of every month\n".format(client.billing_dom))
+                print("      Invoices:")
                 for invoice in invoices:
                     if verbose:
-                        self.l.info(invoice.summary(10)+"\n")
+                        print(invoice.summary(10)+"\n")
                     else:
-                        self.l.info("       %s | %s | %s", invoice.id, invoice.date.strftime("%d %b %Y") , invoice.particulars)
-                self.l.info("      Timesheets:")
+                        print("       {} | {} | {}".format(invoice.id, invoice.date.strftime("%d %b %Y") , invoice.particulars))
+                print("      Timesheets:")
                 for timesheet in timesheets:
                     if verbose:
-                        self.l.info(timesheet.summary(10)+"\n")
+                        print(timesheet.summary(10)+"\n")
                     else:
-                        self.l.info("       %s | %s | %s", timesheet.id, timesheet.date.strftime("%d %b %Y") , timesheet.description)
-        self.l.info("-"*70)
+                        print("       {} | {} | {}".format(timesheet.id, timesheet.date.strftime("%d %b %Y") , timesheet.description))
+        print("-"*70)
 
 
-        self.l.info("Invoice templates:")
+        print("Invoice templates:")
         for template in sess.query(model.InvoiceTemplate).all():
-            self.l.info(" %20s | %s ", template.name, template.description)
-        self.l.info("-"*70)
+            print(" {:20} | {} ".format(template.name, template.description))
+        print("-"*70)
 
 
     def __call__(self):
@@ -228,9 +228,9 @@ class TemplateCommand(Command):
 
     def list_(self):
         sess = model.get_session(self.args['db'])
-        self.l.info("Templates :")
+        print("Templates :")
         for template in sess.query(model.InvoiceTemplate).all():
-            self.l.info("%20s | %s ", template.name, template.description)
+            print("{:20} | {} ".format(template.name, template.description))
 
             
 
@@ -355,7 +355,7 @@ class AccountCommand(Command):
         except NoResultFound:
             self.l.critical("No account with name %s", name)
             raise
-        self.l.info(account.summary())
+        print(account.summary())
 
     def edit(self):
         name = self.args["name"]
@@ -410,9 +410,9 @@ class AccountCommand(Command):
 
     def list(self):
         sess = model.get_session(self.args['db'])
-        self.l.info("Accounts")
+        print("Accounts")
         for i in sess.query(model.Account).all():
-            self.l.info(" %5d | %s",i.id, i.name)
+            print(" {:5} | {}".format(i.id, i.name))
 
 class ClientCommand(Command):
     def __init__(self, args):
@@ -432,16 +432,16 @@ class ClientCommand(Command):
             self.l.critical("No such client '%s'", client)
             raise
 
-        self.l.info("Client      : %s (%s)", client.name, client.account.name)
-        self.l.info("Bill unit   : %s", client.bill_unit)
-        self.l.info("Billing dom : %s", client.billing_dom)
-        self.l.info("Address     :\n%s", client.address)
+        print("Client      : {} ({})".format(client.name, client.account.name))
+        print("Bill unit   : {}".format(client.bill_unit))
+        print("Billing dom : {}".format(client.billing_dom))
+        print("Address     :\n{}".format(client.address))
 
         
-        self.l.info("-"*50)
-        self.l.info("Total income      : %s", "TBD")
-        self.l.info("Total debits      : %s", "TBD")
-        self.l.info("Total time billed : %s", "TBD")
+        print("-"*50)
+        print("Total income      : {}".format("TBD"))
+        print("Total debits      : {}".format("TBD"))
+        print("Total time billed : {}".format("TBD"))
 
         
     def edit(self):
@@ -502,9 +502,9 @@ class ClientCommand(Command):
     
     def list(self):
         sess = model.get_session(self.args['db'])
-        self.l.info("Clients")
+        print("Clients")
         for i in sess.query(model.Client).all():
-            self.l.info(" %s | %s ", i.name, i.account.name)
+            print(" {:>5} | {} ".format(i.name, i.account.name))
 
 
 class InvoiceCommand(Command):
