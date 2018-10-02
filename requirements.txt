@@ -1,5 +1,4 @@
 alembic==0.8.9
--e git+git@github.com:hamon-in/invoice.git@c4c581e5e6422ea1a0de4e957d83b0735afe524c#egg=invoice-migrations
 Mako==1.0.6
 MarkupSafe==0.23
 Pillow==3.4.2
