@@ -12,11 +12,41 @@ This is a command line tool to manage invoices for a small company. We can manag
 1. Invoice : Invoice commands
 1. Tag : Tag commands 
 
+To generate a simple invoice in pdf  we have to add at least one account for our use. Use add command in the account.
+```
+invoice -f INVOICE_DB account add -n name -s sign -a addr -p 76543 -e email --bank-details 'HDFC Bank,calicut'
+```
+Then we need to add a client entry in this tool. Use add command in client.
+```
+invoice -f INVOICE_DB client add  -n NAME -a ACCOUNT -b INR --address ADDRESS -p period
+```
+Then we need a letterhead template in pdf and add this to the template with the name.  Use add command in the template.
+```
+invoice -f INVOICE_DB template add -n samplename -l letterhead.pdf
+```
+Then import the timesheet of all employees, they worked for some client. Add client name, employee name, template and date with this command.
+```
+invoice -f INVOICE_DB timesheet import -e Hasna -c IRF -s Imported -t template -d 02/Oct/2018 timesheet.org
+```
+We can generate a pdf file for this added timesheet by choosing the id. Use generate command in the timesheet
+```
+invoice -f INVOICE_DB timesheet generate -d 3 --format pdf
+```
+Finally add the invoice with the template, client and some particular
+```
+invoice -f INVOICE_DB invoice add -c IRF -t sample -p PARTICULARS
+```
+And Generate the invoice with the format and other filter options.
+```
+invoice -f INVOICE_DB invoice generate -i 1 --format pdf
+```
+
 ## Init 
 After creating the database for this tool, this command is used to initialise the database.
 ```
 invoice -f INVOICE_DB init
 ```
+Here INVOICE_DB is a just filename with DB extension.  
 ## DB commands
 This command is used to manage invoice database. DB commands have some subcommands to manage. They are listed below:
 1. Info : Summarise database status
@@ -82,7 +112,9 @@ This operation used to add a new client. We use some command line arguments like
    1. -b/--bunit : Units to bill in (e.g. INR)
    1. --address : Client billing address
    1. -p/--period: Day of month on which this customer should be billed.
-   1. invoice -f invoice.db client add  -n NAME -a ACCOUNT -b INR --address ADDRESS -p period
+```
+ invoice -f INVOICE_DB client add  -n NAME -a ACCOUNT -b INR --address ADDRESS -p period
+```
 * List:
 This operation is used to list all clients
 ```
@@ -112,13 +144,17 @@ This command is used to add a new template. We can use some command line argumen
 ``` 
 invoice -f INVOICE_DB template add -n samplename
 ```
+Here the letterhead file should be pdf and we can style the pdf beforehand. Styling like add header, footer, outline etc. And this pdf we can add as letterhead in templates.
+
 * Edit:
 This command is used to edit the existing template with the name. We can use some arguments like::
    1. -d/--desc : change description of template
    1. -l/--letterhead : Change template letterhead to this file
 ``` 
-invoice -f INVOICE_DB template edit templatename -l ~/Documents/invoice_t1.pdf 
+invoice -f INVOICE_DB template edit templatename -l etterhead.pdf
 ```
+Here the letterhead file should be a pdf as explained above
+
 * Remove:
 This command is used to delete template with the name.
 ```
@@ -163,21 +199,29 @@ This command is used to list timesheets
 invoice -f INVOICE_DB timesheet ls
 ```
 * Import:
-This command is used to import new timesheet. We can use some command line arguments like.
+This command is used to import new timesheet. In most cases, we have to use this command for creating timesheets. We can use some command line arguments like.
    1. -d/--date : timesheet date (10/Aug/2010)
    1. -e/--employee : employee name 
    1. -c/--client : client name
    1. -t/--template : Template to use timesheet : timesheet file instead of timesheet 
-
 ```
-invoice -f INVOICE_DB timesheet import -e Hasna -c IRF -s Imported -t sample -d 02/Oct/2018 ../../work.org 
+invoice -f INVOICE_DB timesheet import -e Hasna -c IRF -s Imported -t sample -d 02/Oct/2018 timesheet.org 
+```
+Here we can use the org file as the timesheet. It should be in one format. Use Org’s time-clocking support for entering clock time. And use the plain list for outline tree to list the months and days. The format is given below.
+```
+* jan
+** [2018-01-01 Mon]
+   :LOGBOOK:
+   CLOCK: [2018-01-01 Mon 14:39]--[2018-01-01 Mon 17:51] =>  3:12
+   CLOCK: [2018-01-01 Mon 10:14]--[2018-01-01 Mon 13:59] =>  3:45
+   :END:
 ```
 * Parse:
 This command is used to parse and print a timesheet. And the given timesheet to see if there are any errors and it looks good.
-
 ```
-invoice -f INVOICE_DB timesheet parse ../../work.org
+invoice -f INVOICE_DB timesheet parse timesheet 
 ```
+Here the timesheet should be the org file as explained above.
 * Generate : 
 This operation will take a timesheet that's already imported and then create a PDF or text version of it which can be sent to the client. Here we can use some command line arguments like: 
    1. -d/--id : generate timesheet with this id (override other options)
@@ -187,13 +231,16 @@ This operation will take a timesheet that's already imported and then create a P
    1. -e/--employee : generate timesheets only for this employee
    1. -c/--client : which client to generate invoices for.
    1. -w /--overwrite : overwrite existing generated files.
-
+```
+invoice -f INVOICE_DB timesheet generate -d 3 --format pdf
+```
 
 ## Invoice
 In this section, the system is managing the Invoices. Here listed some subcommands to manage invoice.
 * Show:	
 This command is used to display invoice details with id.	
-```invoice -f INVOICE_DB invoice show 5
+```
+invoice -f INVOICE_DB invoice show 5
 ```
 * List:
 This command is used to list the invoices and we can use different types of filtering by adding command line arguments. They are listed below:
@@ -203,29 +250,32 @@ This command is used to list the invoices and we can use different types of filt
    1. -g/--tag : show only invoices with this tags. Can be given multiple times.
    1. -a/--all : show all invoices (including cancelled)
 
-```invoice -f INVOICE_DB invoice ls
+```
+invoice -f INVOICE_DB invoice ls
 ```
 * Add:
 Invoice add will open an editor with a buffer where you can add an invoice. You can type the fields into the table that gets displayed and create a new invoice. e.g. if you use a template that has 3 fields (S.no, description, and amount), you will get something like
  | | | |
 
 You can then edit it to be like this
-
+```
 | 1 | Senior engineer| 1000|
 |2  | Junior engineer| 500|
-
+```
 and save it to create an invoice.
 ```
 invoice -f INVOICE_DB invoice add -c IRF -t sample -p PARTICULARS
 ```
 * Remove:
 This command used to delete an invoice with id
-```invoice -f INVOICE_DB invoice rm 1
+```
+invoice -f INVOICE_DB invoice rm 1
 ```
 * Edit: 
 This command used to edit an existing invoice with id
 
-```invoice -f INVOICE_DB invoice edit 2 -c NAME
+```
+invoice -f INVOICE_DB invoice edit 2 -c NAME
 ```
 * Generate:
 this command is used to generate an invoice. Here we can use some command line arguments.
@@ -235,7 +285,9 @@ this command is used to generate an invoice. Here we can use some command line a
    1. --format : Format to output invoice
    1. -c/--client : which client to generate invoices for. 
    1. -w /--overwrite : overwrite existing generated files.
-
+```
+invoice -f INVOICE_DB invoice generate -i 1 --format pdf
+```
 ## Tag
 It's to give labels to invoices like (paid, unpaid, cancelled etc.).when we list invoices. We can filter by tags. Here listed some subcommands to manage tag.
 * Add :
