@@ -12,6 +12,7 @@ import yaml
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import or_
+import sys
 
 
 
@@ -32,6 +33,14 @@ class Command:
         self.l.debug("Options : %s", self.args)
         self.formatters = formatters.get_formatters()
 
+        handler = logging.FileHandler('stdout_logfile.log')
+        handler.setFormatter(logging.Formatter('%(asctime)s %(levelname)s %(message)s'))
+
+        self.logger = logging.getLogger('info_logger')
+        self.logger.setLevel(logging.INFO)
+        self.logger.addHandler(handler)
+        self.logger.addHandler(logging.StreamHandler(sys.stdout))
+
         # Check database version
         if db_init:
             sess = model.get_session(self.args['db'])
@@ -44,7 +53,6 @@ class Command:
             except NoResultFound:
                 self.l.critical("No version found in database. Cannot proceed.")
                 raise
-        
 
     def __call__(self):
         sc_name = self.args['op']
@@ -83,8 +91,8 @@ class DBCommand(Command):
     def info(self):
         sess = model.get_session(self.args['db'])
         db_version = sess.query(model.Config).filter(model.Config.name == "version").one().value
-        print("Database version %s".format(db_version))
-        print("Software version %s".format(__version__))
+        print("Database version {}".format(db_version))
+        print("Software version {}".format(__version__))
         if semver.compare(db_version, __version__) == -1:
             self.l.info("Database older than software. Consider updating.")
         elif semver.compare(db_version, __version__) == 1:
@@ -95,7 +103,7 @@ class DBCommand(Command):
         db_version = sess.query(model.Config).filter(model.Config.name == "version").one().value
         sw_version = __version__
         alembic_cfg = helpers.get_alembic_config(self.args['db'])
-        
+
         self.l.debug("Software version %s", sw_version)
         self.l.debug("Database version %s", db_version)
         if semver.compare(db_version, sw_version) == -1:
@@ -104,7 +112,7 @@ class DBCommand(Command):
             version.value = __version__
             sess.add(version)
             sess.commit()
-            self.l.info("Database older than software. Updated to %s", __version__)
+            self.logger.info("Database older than software. Updated to %s", __version__)
         elif semver.compare(db_version, __version__) == 1:
             self.l.info("Database newer than software. Please upgrade the application.")
         else:
@@ -120,7 +128,7 @@ class DBCommand(Command):
         self.l.debug("Database version %s", db_version)
         if semver.compare(db_version, sw_version) == -1:
             command.revision(alembic_cfg, "head", autogenerate=True, rev_id=sw_version)
-            self.l.info("New migration created from %s to %s", db_version, sw_version)
+            self.logger.info("New migration created from %s to %s", db_version, sw_version)
         else:
             self.l.info("Migrations not nececssary. Database is not older than software")
 
@@ -554,9 +562,9 @@ class InvoiceCommand(Command):
         if invoices:
             for invoice in invoices:
                 tags = ", ".join (x.name for x in invoice.tags)
-                self.l.info("     %3s | %15s | %s | %5s | %30s | %s ", invoice.id, invoice.number, invoice.date.strftime("%d %b %Y"), invoice.client.name,  invoice.particulars[:30], tags)
+                self.logger.info("     %3s | %15s | %s | %5s | %30s | %s ", invoice.id, invoice.number, invoice.date.strftime("%d %b %Y"), invoice.client.name,  invoice.particulars[:30], tags)
         else:
-            self.l.info("No invoices matching criteria")
+            self.logger.info("No invoices matching criteria")
         
     def add(self):
         self.l.debug("Adding invoice")
@@ -599,7 +607,7 @@ class InvoiceCommand(Command):
                                 client = client)
         sess.add(invoice)
         sess.commit()
-        self.l.info("Added invoice with number %d(%s)", invoice.id, invoice.number)
+        self.logger.info("Added invoice with number %d(%s)", invoice.id, invoice.number)
         
     def generate(self):
         sess = model.get_session(self.args['db'])
@@ -626,7 +634,7 @@ class InvoiceCommand(Command):
         if invoices:
             for invoice in invoices:
                 fname = formatter.generate_invoice(invoice, False, overwrite)
-                self.l.info("  Generated invoice %s", fname)
+                self.logger.info("  Generated invoice %s", fname)
         else:
             self.l.critical("No invoices found matching these criteria")
 
@@ -717,9 +725,9 @@ class TagCommand(Command):
 
     def list(self):
         sess = model.get_session(self.args['db'])
-        self.l.info("Tags:")
+        self.logger.info("Tags:")
         for t in sess.query(model.InvoiceTag).all():
-            self.l.info(" %s %s", t.name, "*" if t.system else '')
+            self.logger.info(" %s %s", t.name, "*" if t.system else '')
 
     def add(self):
         sess = model.get_session(self.args['db'])
@@ -764,7 +772,7 @@ class TimesheetCommand(Command):
     def parse(self):
         with open(self.args['timesheet']) as f:
             timesheet = json.loads(self.parse_timesheet(f))
-            self.l.info("\nParsed timesheet:")
+            self.logger.info("\nParsed timesheet:")
             data = sorted(timesheet.items(), key=lambda x: datetime.datetime.strptime(x[0], '%d/%m/%Y %a'))
             total = Decimal(0.0)
             for k,v in data:
@@ -772,8 +780,8 @@ class TimesheetCommand(Command):
                 total += value
                 self.l.info("%15s | %+6s ", k, value.quantize(Decimal('0.01')))
 
-            self.l.info("----------------+-------")
-            self.l.info("%15s | %+6s\n", "Total", total.quantize(Decimal('0.01')))
+            self.logger.info("----------------+-------")
+            self.logger.info("%15s | %+6s\n", "Total", total.quantize(Decimal('0.01')))
         
 
     def ls(self):
@@ -782,9 +790,9 @@ class TimesheetCommand(Command):
         if self.args['chronological']:
             timesheets = timesheets.order_by(model.Timesheet.date)
         
-        self.l.info("Timesheets:")
+        self.logger.info("Timesheets:")
         for timesheet in timesheets.all():
-            self.l.info("  %4s | %8s | %10s | %s | %s ", 
+            self.logger.info("  %4s | %8s | %10s | %s | %s ", 
                         timesheet.id, 
                         timesheet.client.name, 
                         timesheet.employee, 
@@ -882,24 +890,24 @@ class TimesheetCommand(Command):
         id = self.args['id']
 
         if id != -1:
-            self.l.info("Generating timesheet with %s", id)
+            self.logger.info("Generating timesheet with %s", id)
             j = sess.query(model.Timesheet).filter(model.Timesheet.id == id)
         else:
-            self.l.info("Timesheets between %s and %s", self.args['from'], self.args['to'])
+            self.logger.info("Timesheets between %s and %s", self.args['from'], self.args['to'])
             j = sess.query(model.Timesheet).join(model.Client).filter(date_start <= model.Timesheet.date,
                                                                       model.Timesheet.date <= date_to)
             if client:
-                self.l.info("Filtering by client %s", client)
+                self.logger.info("Filtering by client %s", client)
                 j = j.filter(model.Client.name == client)
             if employee:
-                self.l.info("Filtering by employee %s", employee)
+                self.logger.info("Filtering by employee %s", employee)
                 j = j.filter(model.Timesheet.employee == employee)
 
         timesheets = j.all()
         if timesheets:
             for timesheet in timesheets:
                 fname = formatter.generate_timesheet(timesheet, False, overwrite)
-                self.l.info("  Generated timesheet %s", fname)
+                self.logger.info("  Generated timesheet %s", fname)
 
         else:
             self.l.critical("No timesheet found matching these criteria")
